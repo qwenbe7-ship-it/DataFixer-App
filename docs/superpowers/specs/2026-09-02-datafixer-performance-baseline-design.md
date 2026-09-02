@@ -12,8 +12,8 @@ DataFixer has strong correctness, browser, privacy and deployment gates, but it 
 
 1. Reproduce the same representative benchmark data from version-controlled inputs.
 2. Measure representative Clean, Merge and Validate pipelines at realistic row counts.
-3. Record both elapsed time and heap-growth budgets.
-4. Fail CI only on material regressions, not normal hosted-runner jitter.
+3. Record both elapsed time and retained-heap budgets.
+4. Fail CI only on material regressions, not normal hosted-runner jitter or arbitrary GC timing.
 5. Emit machine-readable benchmark evidence for later TD-008 before/after comparison.
 6. Keep production runtime behavior unchanged.
 
@@ -60,7 +60,7 @@ Each case records:
 - row count(s);
 - deterministic seed;
 - maximum median elapsed milliseconds;
-- maximum observed heap delta MiB;
+- maximum retained heap delta MiB;
 - calibration metadata identifying Node 22.16.0 and GitHub-hosted Ubuntu baseline.
 
 The manifest is the versioned benchmark dataset contract. Raw rows are generated deterministically from it rather than stored as large repository blobs.
@@ -83,7 +83,7 @@ This exercises normal rule paths without trying to model every customer workbook
 
 ### 3. Performance runner
 
-Add a dedicated `performance` project to `vitest.config.ts`, including only `tests/performance/**/*.test.ts`, Node environment, one worker and serial execution.
+Add a dedicated `performance` project to `vitest.config.ts`, including only `tests/performance/**/*.test.ts` in Node. The project will use the `forks` pool with `execArgv: ['--expose-gc']`, `maxWorkers: 1`, `fileParallelism: false`, and serial test definitions. This isolates the benchmark from normal unit-test concurrency and makes explicit GC available to the benchmark worker.
 
 Add `tests/performance/pipeline-performance.test.ts`.
 
@@ -91,15 +91,17 @@ For each case it will:
 
 1. generate input outside the timed section where appropriate;
 2. run one warm-up iteration;
-3. run three measured iterations;
-4. collect elapsed time with `performance.now()`;
-5. collect `process.memoryUsage().heapUsed` before and after the measured pipeline;
-6. use median elapsed time to reduce scheduler noise;
-7. use the maximum measured positive heap delta as the memory observation;
-8. assert both values are below the manifest budgets;
-9. append a structured case result to the benchmark report.
+3. require `globalThis.gc` to be available; absence is a benchmark configuration failure;
+4. before each measured iteration, call explicit GC and record baseline `process.memoryUsage().heapUsed`;
+5. run the pipeline and collect elapsed time with `performance.now()`; GC time is excluded from the timing;
+6. after the pipeline, call explicit GC again and record retained `heapUsed`;
+7. run three measured iterations;
+8. use median elapsed time to reduce scheduler noise;
+9. use the maximum positive post-GC retained-heap delta as the memory observation;
+10. assert both values are below the manifest budgets;
+11. append a structured case result to the benchmark report.
 
-The benchmark process must not run cases concurrently.
+The benchmark process must not run cases concurrently. The report also retains raw before/after heap observations so future investigations can distinguish a true retained-memory regression from timing noise.
 
 ### 4. Machine-readable evidence
 
@@ -112,7 +114,7 @@ Add `tests/performance/report.ts`, which writes `benchmark-report.json` containi
 - per-case row counts;
 - iteration timings;
 - median timing;
-- heap deltas;
+- pre/post-GC heap observations and retained-heap deltas;
 - configured budgets;
 - PASS/FAIL.
 
@@ -122,7 +124,7 @@ The report must contain no customer data because all benchmark data is synthetic
 
 Add package script:
 
-- `test:performance` — runs only the Vitest `performance` project serially.
+- `test:performance` — runs only the Vitest `performance` project.
 
 Update `scripts/production-gates.sh` so the performance gate runs after unit tests and before browser/build/E2E gates. A performance regression becomes an official production-gate failure.
 
@@ -137,21 +139,21 @@ Thresholds must not be guessed.
 Implementation will use two commits on the feature branch:
 
 1. **Measurement commit:** runner/report plumbing with threshold enforcement disabled only for calibration on the feature branch. Run the same benchmark at least three times in GitHub Actions on Node 22.16.0.
-2. **Enforcement commit:** set each timing budget to at least 1.75x the slowest observed median and each heap budget to at least 1.5x the largest observed heap delta, rounded upward to a clear engineering value. Then enable assertions and rerun the full production gate.
+2. **Enforcement commit:** set each timing budget to at least 1.75x the slowest observed median and each retained-heap budget to at least 1.5x the largest observed post-GC retained-heap delta, rounded upward to a clear engineering value. Then enable assertions and rerun the full production gate.
 
 The calibration-only state must never merge to `main`.
 
-If a case shows high variance (max median / min median > 1.35), it is not suitable as a required timing gate until the source of variance is understood. The implementation must adjust isolation or move that measurement to observational-only evidence rather than masking the variance with an extreme threshold.
+If a timing case shows high variance (max median / min median > 1.35), it is not suitable as a required timing gate until the source of variance is understood. The implementation must adjust isolation or move that timing measurement to observational-only evidence rather than masking the variance with an extreme threshold. If retained-heap observations remain unstable after explicit GC, the implementation must investigate the allocation path before setting a memory budget.
 
 ## TDD / contract sequence
 
 1. Add a harness contract test that expects the performance project, manifest, package script and production-gate invocation. Confirm RED.
 2. Add manifest/generator/runner/report plumbing. Confirm the contract turns GREEN.
 3. Add generator determinism tests, including the fixed canonical fixture hash.
-4. Add benchmark-report schema tests.
+4. Add benchmark-report schema and explicit-GC configuration tests.
 5. Run calibration in trusted GitHub Actions.
 6. Commit objective budgets derived from those runs.
-7. Add/enforce timing and heap assertions.
+7. Add/enforce timing and retained-heap assertions.
 8. Run full local harness, official production gates and PR CI.
 9. After merge, require the normal Vercel deployment and exact-SHA live-host gate to pass even though runtime behavior should be unchanged.
 
@@ -159,10 +161,12 @@ If a case shows high variance (max median / min median > 1.35), it is not suitab
 
 - Missing/invalid baseline manifest: FAIL.
 - Non-deterministic generator test: FAIL.
+- `globalThis.gc` unavailable in the performance project: FAIL with configuration guidance.
 - Benchmark case exceeds elapsed-time budget: FAIL with case, observed median and budget.
-- Benchmark case exceeds heap budget: FAIL with case, observed maximum delta and budget.
+- Benchmark case exceeds retained-heap budget: FAIL with case, observed maximum delta and budget.
 - Report cannot be written: FAIL.
-- Normal CI environment variance that exceeds the 1.35 calibration criterion: do not silently raise budgets; investigate before enforcement.
+- Normal CI timing variance that exceeds the 1.35 calibration criterion: do not silently raise budgets; investigate before enforcement.
+- Unstable retained-heap observations after explicit GC: do not silently raise budgets; investigate before enforcement.
 
 ## TD-008 dependency
 
@@ -170,6 +174,7 @@ TD-008 work begins only after this baseline is merged and green. SheetJS lazy-lo
 
 - production build chunk sizes;
 - benchmark timings;
+- retained heap;
 - worker startup/first XLSX use where measurable;
 - full correctness/browser/live-host gates.
 
@@ -181,7 +186,7 @@ TD-005 is closed only when all of the following are true:
 
 - deterministic benchmark manifest/generator are versioned;
 - Clean, Merge and Validate have 10k and 50k-class cases;
-- timing and heap budgets are derived from repeated trusted CI measurements;
+- timing and retained-heap budgets are derived from repeated trusted CI measurements;
 - required performance assertions are active in `production-gates.sh`;
 - `datafixer-performance` retains the machine-readable benchmark report in CI;
 - full production gates pass;
