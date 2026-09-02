@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "../../.local-test-fill-coalesce"
+  },
+  "include": [
+    "fill-coalesce-check.ts",
+    "../../src/domain/types.ts",
+    "../../src/domain/errors.ts",
+    "../../src/domain/factories.ts",
+    "../../src/rules/clean.ts",
+    "../../src/rules/engine.ts"
+  ]
+}

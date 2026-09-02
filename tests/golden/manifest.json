@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "clean-orders",
+      "mode": "clean",
+      "inputs": [{"path": "public/examples/clean-orders.csv", "name": "clean-orders.csv"}],
+      "settings": "public/sales-samples/clean/settings.json",
+      "expectedSummary": {"inputRows": 4, "unchangedRows": 1, "changedRows": 1, "removedRows": 1, "rejectedRows": 1, "reconciled": true},
+      "requiredReasonKeys": ["clean.trimmed", "clean.duplicateRemoved", "clean.invalidNumber"]
+    },
+    {
+      "id": "merge-two-schemas",
+      "mode": "merge",
+      "inputs": [
+        {"path": "public/examples/merge-north.csv", "name": "merge-north.csv"},
+        {"path": "public/examples/merge-south.csv", "name": "merge-south.csv"}
+      ],
+      "settings": "public/sales-samples/merge/settings.json",
+      "expectedSummary": {"inputRows": 5, "unchangedRows": 0, "changedRows": 3, "removedRows": 1, "rejectedRows": 1, "reconciled": true},
+      "requiredReasonKeys": ["merge.mapped", "merge.duplicateRemoved", "merge.typeConflict"]
+    },
+    {
+      "id": "lookup-exact-sku",
+      "mode": "lookup",
+      "inputs": [
+        {"path": "public/examples/lookup-orders.csv", "name": "lookup-orders.csv"},
+        {"path": "public/examples/lookup-inventory.csv", "name": "lookup-inventory.csv"}
+      ],
+      "settings": "public/examples/lookup-settings.json",
+      "expectedSummary": {"inputRows": 3, "unchangedRows": 0, "changedRows": 1, "removedRows": 0, "rejectedRows": 2, "reconciled": true},
+      "requiredReasonKeys": ["lookup.valueAdded", "lookup.multipleMatches", "lookup.notFound"]
+    },
+    {
+      "id": "validate-contacts",
+      "mode": "validate",
+      "inputs": [{"path": "public/examples/validate-contacts.csv", "name": "validate-contacts.csv"}],
+      "settings": "public/sales-samples/validate/settings.json",
+      "expectedSummary": {"inputRows": 3, "unchangedRows": 1, "changedRows": 0, "removedRows": 0, "rejectedRows": 2, "reconciled": true},
+      "requiredReasonKeys": ["validate.unique", "validate.allowed", "validate.numberRange", "validate.length", "validate.regex", "validate.columnCompare"]
+    },
+    {
+      "id": "pattern-normalize",
+      "mode": "clean",
+      "inputs": [{"path": "public/examples/pattern-normalize.csv", "name": "pattern-normalize.csv"}],
+      "settings": "public/examples/pattern-normalize-settings.json",
+      "expectedSummary": {"inputRows": 3, "unchangedRows": 0, "changedRows": 3, "removedRows": 0, "rejectedRows": 0, "reconciled": true},
+      "requiredReasonKeys": ["clean.regexReplaced", "clean.caseChanged"]
+    },
+    {
+      "id": "fill-default-coalesce",
+      "mode": "clean",
+      "inputs": [{"path": "public/examples/fill-coalesce.csv", "name": "fill-coalesce.csv"}],
+      "settings": "public/examples/fill-coalesce-settings.json",
+      "expectedSummary": {"inputRows": 4, "unchangedRows": 1, "changedRows": 3, "removedRows": 0, "rejectedRows": 0, "reconciled": true},
+      "requiredReasonKeys": ["clean.defaultFilled", "clean.coalesced"]
+    }
+  ]
+}

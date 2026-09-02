@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "../../.local-test-html-report"
+  },
+  "include": [
+    "html-report-check.ts",
+    "../../src/domain/types.ts",
+    "../../src/domain/factories.ts",
+    "../../src/export/html-report.ts"
+  ]
+}

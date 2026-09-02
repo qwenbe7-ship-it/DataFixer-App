@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "CommonJS", "moduleResolution": "Node", "strict": true,
+    "esModuleInterop": true, "skipLibCheck": true, "outDir": "/tmp/datafixer-validate-csv-semantics"
+  },
+  "include": ["../../src/domain/types.ts", "../../src/domain/errors.ts", "../../src/domain/factories.ts", "../../src/rules/validate.ts", "validate-csv-semantics-check.ts"]
+}

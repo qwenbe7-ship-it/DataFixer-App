@@ -1,0 +1,31 @@
+{
+  "mergeSettings": {
+    "columnMapBySource": {
+      "merge-north.csv": {
+        "order_id": "id",
+        "total": "amount"
+      },
+      "merge-south.csv": {
+        "amount_krw": "amount",
+        "id": "id"
+      }
+    },
+    "dedupeColumns": [
+      "id"
+    ],
+    "outputColumns": [
+      "id",
+      "amount",
+      "source"
+    ],
+    "outputTypes": {
+      "amount": "number",
+      "id": "string",
+      "source": "string"
+    },
+    "sourceColumn": "source"
+  },
+  "mode": "merge",
+  "rules": [],
+  "version": 1
+}

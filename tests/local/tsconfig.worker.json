@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-worker"
+  },
+  "include": [
+    "../../src/domain/**/*.ts",
+    "../../src/file-io/**/*.ts",
+    "../../src/rules/**/*.ts",
+    "../../src/evidence/**/*.ts",
+    "../../src/export/**/*.ts",
+    "../../src/app/process-job.ts",
+    "../../src/app/app-reducer.ts",
+    "../../src/worker/protocol.ts",
+    "../../src/worker/data.worker.ts",
+    "worker-check.ts",
+    "xlsx-stub.d.ts"
+  ]
+}

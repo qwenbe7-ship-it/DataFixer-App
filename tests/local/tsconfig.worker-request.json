@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target":"ES2022","module":"CommonJS","moduleResolution":"Node","strict":true,"skipLibCheck":true,"lib":["ES2022","DOM"],"outDir":"../../.local-test-worker-request"},
+  "include": ["../../src/domain/**/*.ts","../../src/app/app-reducer.ts","../../src/worker/protocol.ts","../../src/worker/request.ts","worker-request-check.ts"]
+}

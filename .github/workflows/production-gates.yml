@@ -1,0 +1,88 @@
+name: DataFixer production gates
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+      - name: Public boundary unit test
+        run: npm run test:public-boundary
+      - name: Public release boundary
+        run: npm run verify:public-boundary
+      - name: Harness contract
+        run: python tests/harness/harness-contract-check.py
+      - name: Architecture self-test
+        run: python tests/harness/architecture-check-test.py
+      - name: Repo map freshness
+        run: python scripts/generate-repo-map.py --check
+      - name: Verify script contract
+        run: python tests/harness/verify-script-check.py
+      - name: Lockfile validator contract
+        run: python tests/harness/lockfile-validator-check.py
+      - name: Bootstrap workflow contract
+        run: python tests/harness/production-bootstrap-workflow-check.py
+      - name: Unified verifier includes unblock checks
+        run: python tests/harness/verify-local-production-unblock-check.py
+      - name: Browser matrix contract
+        run: python tests/harness/browser-matrix-contract-check.py
+      - name: Privacy production contract
+        run: python tests/harness/privacy-production-contract-check.py
+      - name: Preflight classification contract
+        run: python tests/harness/preflight-contract-check.py
+
+  production:
+    needs: harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Require committed dependency lock
+        run: test -f package-lock.json || { echo 'package-lock.json is a release prerequisite; run the trusted production bootstrap and commit it.' >&2; exit 30; }
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+
+      - name: Validate committed lockfile
+        run: node scripts/validate-lockfile.mjs
+
+      - name: Clean deterministic install
+        run: npm ci --ignore-scripts
+
+      - name: Install Playwright browsers
+        run: ./node_modules/.bin/playwright install --with-deps chromium chrome msedge firefox
+
+      - name: Offline/local harness with project toolchain
+        run: python scripts/verify.py local --report verify-report-local.json
+
+      - name: Official production gates
+        run: python scripts/verify.py official --report verify-report-official.json
+
+      - name: Upload verification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: datafixer-verification
+          path: verify-report-*.json
+
+      - name: Upload production build
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: datafixer-dist
+          path: dist/

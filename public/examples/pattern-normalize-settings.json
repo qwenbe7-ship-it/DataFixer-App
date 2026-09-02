@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "mode": "clean",
+  "rules": [
+    {
+      "id": "phone-digits",
+      "kind": "regexReplace",
+      "column": "phone",
+      "pattern": "[^0-9]+",
+      "replacement": "",
+      "replaceAll": true,
+      "caseInsensitive": false
+    },
+    {
+      "id": "sku-separators",
+      "kind": "regexReplace",
+      "column": "sku",
+      "pattern": "[-\\s]+",
+      "replacement": "",
+      "replaceAll": true,
+      "caseInsensitive": false
+    },
+    {
+      "id": "sku-upper",
+      "kind": "changeCase",
+      "column": "sku",
+      "mode": "upper"
+    }
+  ],
+  "mergeSettings": null
+}

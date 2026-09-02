@@ -1,0 +1,2 @@
+source_file,id,amount_krw,reason
+merge-south.csv,BAD-1,oops,Type conflict in amount

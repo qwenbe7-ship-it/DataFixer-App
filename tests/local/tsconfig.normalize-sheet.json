@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "../../.local-test-normalize-sheet"
+  },
+  "include": [
+    "../../src/domain/types.ts",
+    "../../src/domain/errors.ts",
+    "../../src/domain/factories.ts",
+    "../../src/file-io/normalize-sheet.ts",
+    "./normalize-sheet-check.ts"
+  ]
+}

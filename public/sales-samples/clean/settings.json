@@ -1,0 +1,25 @@
+{
+  "mergeSettings": null,
+  "mode": "clean",
+  "rules": [
+    {
+      "column": "customer",
+      "id": "trim-customer",
+      "kind": "trim"
+    },
+    {
+      "column": "amount",
+      "id": "parse-amount",
+      "kind": "parseNumber",
+      "removeThousandsSeparator": true
+    },
+    {
+      "columns": [
+        "order_id"
+      ],
+      "id": "dedupe-order",
+      "kind": "dedupe"
+    }
+  ],
+  "version": 1
+}

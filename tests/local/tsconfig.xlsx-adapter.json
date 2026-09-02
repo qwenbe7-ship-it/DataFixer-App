@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-xlsx-adapter"
+  },
+  "include": [
+    "xlsx-stub.d.ts",
+    "xlsx-adapter-check.ts",
+    "../../src/domain/types.ts",
+    "../../src/domain/factories.ts",
+    "../../src/domain/errors.ts",
+    "../../src/export/workbook-model.ts",
+    "../../src/export/xlsx-export.ts"
+  ]
+}

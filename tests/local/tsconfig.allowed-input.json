@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-allowed-input"
+  },
+  "include": ["allowed-input-check.ts", "../../src/ui/rule-input.ts", "../../src/domain/types.ts"]
+}

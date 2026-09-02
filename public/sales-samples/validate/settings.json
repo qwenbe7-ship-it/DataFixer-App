@@ -1,0 +1,15 @@
+{
+  "mergeSettings": null,
+  "mode": "validate",
+  "rules": [
+    {"column":"email","id":"required-email","kind":"required"},
+    {"column":"age","expected":"number","id":"age-type","kind":"type"},
+    {"columns":["email"],"id":"unique-email","kind":"unique"},
+    {"column":"status","id":"status-allowed","kind":"allowed","values":["ACTIVE","INACTIVE"]},
+    {"column":"age","id":"age-range","kind":"numberRange","max":65,"min":18},
+    {"column":"name","id":"name-length","kind":"length","max":20,"min":2},
+    {"column":"code","id":"code-shape","kind":"regex","pattern":"^AB-\\d{3}$"},
+    {"id":"min-lte-max","kind":"columnCompare","left":"min_value","operator":"lte","right":"max_value"}
+  ],
+  "version": 1
+}

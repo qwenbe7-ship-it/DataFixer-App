@@ -1,0 +1,6 @@
+source_row,status,reason
+merge-north.csv:2,CHANGED,Mapped to id/amount/source output
+merge-north.csv:3,CHANGED,Mapped to id/amount/source output
+merge-south.csv:2,CHANGED,Mapped to id/amount/source output
+merge-south.csv:3,REMOVED,Duplicate id DUP-1 removed after mapping
+merge-south.csv:4,REJECTED,amount type conflicts with numeric output

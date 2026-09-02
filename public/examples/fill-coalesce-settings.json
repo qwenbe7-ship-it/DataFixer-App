@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "mode": "clean",
+  "rules": [
+    {
+      "id": "country-default",
+      "kind": "fillDefault",
+      "column": "country",
+      "value": "US"
+    },
+    {
+      "id": "phone-fallback",
+      "kind": "coalesce",
+      "column": "phone",
+      "sourceColumns": ["phone", "mobile", "backup"]
+    }
+  ],
+  "mergeSettings": null
+}

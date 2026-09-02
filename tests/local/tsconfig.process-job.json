@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "CommonJS", "moduleResolution": "Node", "strict": true,
+    "skipLibCheck": true, "lib": ["ES2022", "DOM"], "outDir": "../../.local-test-process-job"
+  },
+  "include": [
+    "../../src/app/process-job.ts", "../../src/domain/**/*.ts", "../../src/rules/**/*.ts", "../../src/evidence/**/*.ts", "process-job-check.ts"
+  ]
+}

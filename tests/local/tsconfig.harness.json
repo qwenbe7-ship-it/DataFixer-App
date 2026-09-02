@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Bundler",
+    "rootDir": "../..",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "outDir": "../../.local-test-harness"
+  },
+  "include": [
+    "../../src/**/*.ts",
+    "./*-check.ts",
+    "./xlsx-stub.d.ts",
+    "./node-fs-stub.d.ts",
+    "./node-stub.d.ts"
+  ],
+  "exclude": [
+    "../../src/worker/browser-worker.ts"
+  ]
+}

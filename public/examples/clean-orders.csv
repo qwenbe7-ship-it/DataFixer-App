@@ -1,0 +1,5 @@
+order_id,customer,amount,date
+A-1001," Alice ",,2026-09-01
+A-1002,Bob,,2026-09-02
+A-1002,Bob,,2026-09-02
+A-1003,Carol,invalid,2026-09-03

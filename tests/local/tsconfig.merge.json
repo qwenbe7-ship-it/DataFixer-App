@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "/tmp/datafixer-merge-check"
+  },
+  "include": [
+    "../../src/domain/types.ts",
+    "../../src/domain/errors.ts",
+    "../../src/domain/factories.ts",
+    "merge-check.ts"
+  ]
+}

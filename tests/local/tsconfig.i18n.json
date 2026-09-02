@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "CommonJS", "moduleResolution": "Node", "strict": true,
+    "skipLibCheck": true, "lib": ["ES2022", "DOM"], "outDir": "../../.local-test-i18n"
+  },
+  "include": ["../../src/i18n/**/*.ts", "i18n-check.ts"]
+}

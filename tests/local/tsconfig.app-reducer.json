@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-app-reducer"
+  },
+  "include": ["../../src/app/app-reducer.ts", "../../src/domain/types.ts", "../../src/domain/errors.ts", "app-reducer-check.ts"]
+}

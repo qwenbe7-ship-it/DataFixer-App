@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-limits"
+  },
+  "include": [
+    "../../src/domain/errors.ts",
+    "../../src/file-io/limits.ts",
+    "./limits-check.ts"
+  ]
+}

@@ -14,6 +14,15 @@ Customer workbook bytes, cell data, job settings, and generated evidence are pro
 - Up to 20 MiB per file
 - Up to 50 MiB total per job
 
+## Core workflows
+
+- Clean — deterministic text/value cleanup rules
+- Merge — combine files with explicit type and deduplication behavior
+- Exact Lookup — deterministic exact-key enrichment without fuzzy guessing
+- Validate — accepted/rejected row partitioning with evidence
+- Step 19 — Pattern Normalize — safe regular-expression pattern replacement
+- Step 20 — Fill / Default / Coalesce — fill missing values and select the first available source value
+
 ## Outputs
 
 Depending on the workflow, DataFixer can produce cleaned or merged XLSX output, rejected-row output, HTML evidence reports, and reusable JSON settings.
