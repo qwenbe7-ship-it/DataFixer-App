@@ -2,17 +2,18 @@
 
 Only active debt or release-process gaps belong here. Resolved bootstrap and browser blockers are intentionally removed from the active list.
 
-## Verified baseline
+## Runtime verification baseline
 
-- Public repository: `qwenbe7-ship-it/DataFixer-App`
-- Verified `main`: `11b8073991e015fb22789e409e8e88517bfe6982`
-- GitHub Actions run: `33583805040`
+This section identifies the last runtime-affecting commit used for the detailed release evidence. Documentation-only commits may advance `main` without changing this baseline; update it only when application source, dependencies, build/hosting configuration, workflows, or tests materially change.
+
+- Runtime-affecting baseline commit: `11b8073991e015fb22789e409e8e88517bfe6982`
+- GitHub Actions evidence run: `33583805040`
 - Harness: PASS
 - Official production gates: PASS
 - Unit tests: 74 PASS
 - Browser tests: 4 PASS
 - Playwright E2E: 33 PASS across Chrome, Edge and Firefox
-- Vercel Git status on the verified commit: `success` / `Deployment has completed`
+- Vercel Git status on the runtime baseline: `success` / `Deployment has completed`
 - Vercel target project: `qwenbe/data-fixer-app`
 
 ## TD-003 — Live Vercel host privacy/header capture pending
