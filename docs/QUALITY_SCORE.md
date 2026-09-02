@@ -1,6 +1,6 @@
 # DataFixer Quality Score
 
-This is an evidence scorecard, not a release badge. Scores below are anchored to verified `main` commit `11b8073991e015fb22789e409e8e88517bfe6982` and GitHub Actions run `33583805040`.
+This is an evidence scorecard, not a release badge. Scores below are anchored to the last runtime-affecting verification baseline, commit `11b8073991e015fb22789e409e8e88517bfe6982` and GitHub Actions run `33583805040`. Documentation-only commits may advance `main` without changing this evidence baseline.
 
 | Area | Score | Verified evidence | Main remaining gap |
 |---|---:|---|---|
@@ -11,7 +11,7 @@ This is an evidence scorecard, not a release badge. Scores below are anchored to
 | UI/browser confidence | 9/10 | Chromium browser tests plus 33 Playwright E2E tests across Chrome, Edge and Firefox | manual accessibility/visual review; Safari is outside V1 promise |
 | Privacy | 8/10 | local production-preview network/header/privacy tests, offline continuation, restrictive CSP contract | direct capture against the live Vercel production origin |
 | Release reproducibility | 9/10 | committed validated lockfile, clean `npm ci`, Node 22.16.0, repeatable GitHub Actions, verification + dist artifacts | `main` ruleset still not enforced |
-| Documentation/operability | 9/10 | architecture, user guides, release checklist, deployment/security docs, refreshed current-state evidence | keep current-state docs synchronized with later releases |
+| Documentation/operability | 9/10 | architecture, user guides, release checklist, deployment/security docs, refreshed current-state evidence | keep current-state docs synchronized with later runtime releases |
 
 ## Current interpretation
 
