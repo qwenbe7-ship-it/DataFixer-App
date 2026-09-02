@@ -29,10 +29,14 @@ test('allows application, test, CI, and safe public example paths', () => {
 });
 
 test('rejects internal commercial language and high-confidence credentials in tracked text', () => {
+  const channel = ['Fiv', 'err'].join('');
+  const founding = ['Founding', 'customer'].join(' ');
+  const githubToken = ['github_', 'pat_', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnop'].join('');
+  const privateKey = ['-----BEGIN ', 'PRIVATE KEY-----', '\nredacted\n', '-----END PRIVATE KEY-----'].join('');
   const findings = findForbiddenContent([
-    { path: 'docs/notes.md', content: 'Primary channel: Fiverr. Founding customer price is $29.' },
-    { path: 'src/config.ts', content: "const token = 'github_pat_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnop';" },
-    { path: 'docs/key.txt', content: '-----BEGIN PRIVATE KEY-----\nredacted\n-----END PRIVATE KEY-----' },
+    { path: 'docs/notes.md', content: `Primary channel: ${channel}. ${founding} price is $${29}.` },
+    { path: 'src/config.ts', content: `const token = '${githubToken}';` },
+    { path: 'docs/key.txt', content: privateKey },
   ]);
 
   assert.deepEqual(findings.map(({ path, rule }) => ({ path, rule })), [
