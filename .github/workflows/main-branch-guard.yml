@@ -1,0 +1,123 @@
+name: Main branch guard
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+  checks: read
+
+jobs:
+  enforce-pr-origin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify main update came from a merged PR with green production gates
+        id: policy
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha;
+            const requiredChecks = ['harness', 'production'];
+
+            let associated = [];
+            for (let attempt = 1; attempt <= 6; attempt += 1) {
+              const response = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha: sha,
+                per_page: 100,
+              });
+              associated = response.data;
+              if (associated.some((pr) => pr.merged_at && pr.base.ref === 'main')) break;
+              if (attempt < 6) await new Promise((resolve) => setTimeout(resolve, 5000));
+            }
+
+            const mergedPr = associated.find((pr) => pr.merged_at && pr.base.ref === 'main');
+            if (!mergedPr) {
+              core.setOutput('authorized', 'false');
+              core.setOutput('reason', `commit ${sha} is not associated with a merged PR targeting main`);
+              return;
+            }
+
+            const checksResponse = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: mergedPr.head.sha,
+              per_page: 100,
+            });
+            const checks = checksResponse.data.check_runs;
+            const failures = [];
+
+            for (const name of requiredChecks) {
+              const matches = checks.filter((check) => check.name === name);
+              const passed = matches.some((check) => check.status === 'completed' && check.conclusion === 'success');
+              if (!passed) failures.push(name);
+            }
+
+            if (failures.length > 0) {
+              core.setOutput('authorized', 'false');
+              core.setOutput('reason', `PR #${mergedPr.number} is missing successful required checks: ${failures.join(', ')}`);
+              return;
+            }
+
+            core.setOutput('authorized', 'true');
+            core.setOutput('reason', `PR #${mergedPr.number} merged with harness and production checks successful`);
+
+      - name: Record policy decision
+        env:
+          AUTHORIZED: ${{ steps.policy.outputs.authorized }}
+          REASON: ${{ steps.policy.outputs.reason }}
+        run: |
+          {
+            echo "## Main branch guard"
+            echo "- authorized: $AUTHORIZED"
+            echo "- reason: $REASON"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check out main for automatic restoration
+        if: steps.policy.outputs.authorized != 'true'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Restore previous main tree after unauthorized update
+        if: steps.policy.outputs.authorized != 'true'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          REASON: ${{ steps.policy.outputs.reason }}
+        run: |
+          set -euo pipefail
+
+          zero_sha='0000000000000000000000000000000000000000'
+          if [[ "$BEFORE_SHA" == "$zero_sha" ]]; then
+            echo "Cannot automatically restore an initial branch creation." >&2
+            exit 1
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git fetch origin "$BEFORE_SHA" || true
+          git cat-file -e "$BEFORE_SHA^{commit}"
+
+          # Keep AFTER_SHA as the parent, but stage and materialize exactly the
+          # tree that main had before the unauthorized update.
+          git read-tree "$BEFORE_SHA^{tree}"
+          git checkout-index -a -f
+          git clean -fd
+
+          if git diff --cached --quiet; then
+            echo "No tree difference to restore; refusing to create an empty guard commit." >&2
+            exit 1
+          fi
+
+          git commit -m "guard: restore main after unauthorized update ${AFTER_SHA}"
+          git push origin HEAD:main
+
+          echo "Unauthorized main update restored to previous tree. Reason: $REASON"
