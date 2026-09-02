@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "manifestVersion": "1.0.0",
+  "enforceBudgets": false,
+  "calibration": {
+    "node": "22.16.0",
+    "platform": "github-ubuntu",
+    "runIds": []
+  },
+  "cases": [
+    { "id": "clean-10k", "operation": "clean", "rows": [10000], "seed": 101, "maxMedianMs": null, "maxRetainedHeapMiB": null },
+    { "id": "clean-50k", "operation": "clean", "rows": [50000], "seed": 102, "maxMedianMs": null, "maxRetainedHeapMiB": null },
+    { "id": "merge-10k-plus-10k", "operation": "merge", "rows": [10000, 10000], "seed": 201, "maxMedianMs": null, "maxRetainedHeapMiB": null },
+    { "id": "merge-50k-plus-50k", "operation": "merge", "rows": [50000, 50000], "seed": 202, "maxMedianMs": null, "maxRetainedHeapMiB": null },
+    { "id": "validate-10k", "operation": "validate", "rows": [10000], "seed": 301, "maxMedianMs": null, "maxRetainedHeapMiB": null },
+    { "id": "validate-50k", "operation": "validate", "rows": [50000], "seed": 302, "maxMedianMs": null, "maxRetainedHeapMiB": null }
+  ]
+}

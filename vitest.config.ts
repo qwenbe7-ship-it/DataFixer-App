@@ -15,6 +15,17 @@ export default defineConfig({
       },
       {
         test: {
+          name: 'performance',
+          include: ['tests/performance/**/*.test.ts'],
+          environment: 'node',
+          pool: 'forks',
+          execArgv: ['--expose-gc'],
+          maxWorkers: 1,
+          fileParallelism: false,
+        },
+      },
+      {
+        test: {
           name: 'browser',
           include: ['tests/browser/**/*.test.ts', 'tests/browser/**/*.test.tsx'],
           browser: {
