@@ -161,6 +161,20 @@ async function measureCase(caseDef: BenchmarkCaseDefinition): Promise<BenchmarkC
   };
 }
 
+function assertEnforcedBudgets(caseDef: BenchmarkCaseDefinition, result: BenchmarkCaseResult): void {
+  if (!manifest.enforceBudgets) return;
+  if (caseDef.maxMedianMs === null) throw new Error(`${caseDef.id} missing timing budget`);
+  if (caseDef.maxRetainedHeapMiB === null) throw new Error(`${caseDef.id} missing retained-heap budget`);
+  expect(
+    result.medianMs,
+    `${caseDef.id} median ${result.medianMs.toFixed(2)}ms exceeds ${caseDef.maxMedianMs}ms budget`,
+  ).toBeLessThanOrEqual(caseDef.maxMedianMs);
+  expect(
+    result.maxRetainedHeapMiB,
+    `${caseDef.id} retained heap ${result.maxRetainedHeapMiB.toFixed(2)}MiB exceeds ${caseDef.maxRetainedHeapMiB}MiB budget`,
+  ).toBeLessThanOrEqual(caseDef.maxRetainedHeapMiB);
+}
+
 describe('production pipeline performance baseline', () => {
   it('measures every versioned case and enforces calibrated budgets when enabled', async () => {
     expect(manifest.schemaVersion).toBe(1);
@@ -172,11 +186,8 @@ describe('production pipeline performance baseline', () => {
 
     writeBenchmarkReport(createBenchmarkReport(manifest.manifestVersion, manifest.enforceBudgets, results));
 
-    if (manifest.enforceBudgets) {
-      for (const caseDef of manifest.cases) {
-        expect(caseDef.maxMedianMs, `${caseDef.id} missing timing budget`).not.toBeNull();
-        expect(caseDef.maxRetainedHeapMiB, `${caseDef.id} missing retained-heap budget`).not.toBeNull();
-      }
+    for (let index = 0; index < manifest.cases.length; index += 1) {
+      assertEnforcedBudgets(manifest.cases[index], results[index]);
     }
     expect(results.filter((result) => result.status === 'FAIL')).toEqual([]);
   }, 120_000);
