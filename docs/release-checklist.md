@@ -2,7 +2,7 @@
 
 Status values are restricted to `PASS`, `FAIL`, `BLOCKED`, and `NOT_SUPPORTED`.
 
-Runtime verification baseline: commit `833193891777d264a919b8edc920ba23045754d7`, GitHub production-gate run `33590850615`, automated live-host run `33591009615`. Documentation-only commits may advance `main` without changing this baseline; update it when runtime-affecting source, dependency, build/hosting configuration, workflow, or test changes occur.
+Runtime verification baseline: commit `e164582d2cacee96295900ee88220191067b2644`, GitHub production-gate run `33607098167`, automated live-host run `33607406827`. This baseline was refreshed after the repository-governance workflow change and was re-verified on `main`. Documentation-only commits may advance `main` without changing this baseline; update it when runtime-affecting source, dependency, build/hosting configuration, workflow, or test changes occur.
 
 ## Representative acceptance scenarios
 
@@ -58,10 +58,10 @@ Production origin: `https://data-fixer-app.vercel.app`
 
 The release gate first proves it is testing the intended deployment: Vercel exposes `VERCEL_GIT_COMMIT_SHA` at build time, Vite writes it into the production HTML as `datafixer-build-sha`, and the live verifier requires exact equality with `DATAFIXER_EXPECTED_SHA` from the successful `main` production-gate workflow run.
 
-Verified on runtime baseline `833193891777d264a919b8edc920ba23045754d7`:
-- workflow checkout SHA: `833193891777d264a919b8edc920ba23045754d7`;
-- expected deployed SHA: `833193891777d264a919b8edc920ba23045754d7`;
-- deployed HTML `datafixer-build-sha`: `833193891777d264a919b8edc920ba23045754d7`;
+Verified on runtime baseline `e164582d2cacee96295900ee88220191067b2644`:
+- workflow checkout SHA: `e164582d2cacee96295900ee88220191067b2644`;
+- expected deployed SHA: `e164582d2cacee96295900ee88220191067b2644`;
+- deployed HTML `datafixer-build-sha`: `e164582d2cacee96295900ee88220191067b2644`;
 - `Content-Security-Policy` contains `frame-ancestors 'none'`;
 - `X-Content-Type-Options: nosniff`;
 - `X-Frame-Options: DENY`;
@@ -74,7 +74,7 @@ Verified on runtime baseline `833193891777d264a919b8edc920ba23045754d7`:
 - a generated real XLSX workbook is accepted and reconciled successfully;
 - processing and four downloads continue after the already-opened page is switched offline.
 
-Automated live-host run `33591009615`: `PASS`, with exact provenance verification and 5/5 Chrome tests passing. The workflow runs automatically only after a successful `main` production-gate workflow, rather than treating the moving production alias as a pull-request Preview. Manual dispatch remains available for deliberate rechecks.
+Automated live-host run `33607406827`: `PASS`, including Vercel deployment-status wait, exact deployed-SHA provenance/response-header verification, and live CSV/XLSX/privacy smoke tests. The workflow runs automatically only after a successful `main` production-gate workflow, rather than treating the moving production alias as a pull-request Preview. Manual dispatch remains available for deliberate rechecks.
 
 ## Official production evidence
 
@@ -94,12 +94,14 @@ Runtime baseline results:
 - browser tests: 4/4 PASS;
 - Playwright E2E: 36/36 PASS across Chrome, Edge and Firefox;
 - final marker: `ALL_OFFICIAL_PRODUCTION_GATES_PASS`;
-- `datafixer-verification` artifact digest: `sha256:7383d8e4bbac8ba79b5d56089df499665dba8fcb30ae5c8f1540bf18257c33d6`;
-- `datafixer-dist` artifact digest: `sha256:5c39b2addd80c7194a5d656c6c1703e98ba2a1fc08ba88d83c3ae5ddfc408cad`;
-- both artifacts were generated from runtime baseline SHA `833193891777d264a919b8edc920ba23045754d7`.
+- `datafixer-verification` artifact digest: `sha256:78bb6bd106a767c60aed99d5a27bba0812f68214370bbac519b73be0ac507f0b`;
+- `datafixer-dist` artifact digest: `sha256:ea77149a3d9aee421b577b3221b4a83e52cda1c4d53bf286aa432d0130dfe240`;
+- both artifacts were generated from runtime baseline SHA `e164582d2cacee96295900ee88220191067b2644`.
 
 ## Remaining operational release-process gap
 
 The runtime/customer-host release gates are `PASS`.
 
-One repository-governance item remains: enable an enforced GitHub `main` ruleset requiring pull requests and the production-gate checks, with force-push and branch deletion blocked. GitHub currently reports `main` as unprotected and the repository ruleset collection is empty. This is a P1 release-process gap, not a known application/runtime correctness failure.
+The repository now also has an active compensating `Main branch guard` workflow. On the runtime baseline merge, guard run `33607098166` completed `enforce-pr-origin` with `PASS`, confirming that the `main` update came through a merged PR whose `harness` and `production` checks succeeded. The harness contract also requires the guard workflow file so it cannot disappear unnoticed.
+
+One repository-governance item remains open in issue #11: the exact GitHub server-side `main` ruleset is still unavailable because the connected integration has no Administration-write operation. GitHub's ruleset collection remains empty. Therefore direct-push/force-push/deletion are not pre-receive blocked by GitHub itself; the compensating workflow detects unauthorized `main` updates after the push and restores the previous tree. This is a P1 release-process gap, not a known application/runtime correctness failure.
