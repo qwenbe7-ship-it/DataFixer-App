@@ -1,18 +1,28 @@
 {
   "schemaVersion": 1,
   "manifestVersion": "1.0.0",
-  "enforceBudgets": false,
+  "enforceBudgets": true,
   "calibration": {
     "node": "22.16.0",
     "platform": "github-ubuntu",
-    "runIds": []
+    "runIds": [33597055305, 33597316239, 33597364708],
+    "timingVarianceLimit": 1.35,
+    "observationalTimingCases": ["merge-10k-plus-10k", "validate-10k"],
+    "observed": {
+      "clean-10k": { "minMedianMs": 28.09966, "maxMedianMs": 36.494179, "timingVarianceRatio": 1.29874, "maxRetainedHeapMiB": 2.077111 },
+      "clean-50k": { "minMedianMs": 105.344573, "maxMedianMs": 133.712089, "timingVarianceRatio": 1.269283, "maxRetainedHeapMiB": 10.088715 },
+      "merge-10k-plus-10k": { "minMedianMs": 47.98938, "maxMedianMs": 70.230153, "timingVarianceRatio": 1.463458, "maxRetainedHeapMiB": 2.220497 },
+      "merge-50k-plus-50k": { "minMedianMs": 241.143778, "maxMedianMs": 317.118853, "timingVarianceRatio": 1.315063, "maxRetainedHeapMiB": 11.010529 },
+      "validate-10k": { "minMedianMs": 19.136108, "maxMedianMs": 29.39205, "timingVarianceRatio": 1.535939, "maxRetainedHeapMiB": 2.120895 },
+      "validate-50k": { "minMedianMs": 132.824026, "maxMedianMs": 165.068097, "timingVarianceRatio": 1.242758, "maxRetainedHeapMiB": 8.430817 }
+    }
   },
   "cases": [
-    { "id": "clean-10k", "operation": "clean", "rows": [10000], "seed": 101, "maxMedianMs": null, "maxRetainedHeapMiB": null },
-    { "id": "clean-50k", "operation": "clean", "rows": [50000], "seed": 102, "maxMedianMs": null, "maxRetainedHeapMiB": null },
-    { "id": "merge-10k-plus-10k", "operation": "merge", "rows": [10000, 10000], "seed": 201, "maxMedianMs": null, "maxRetainedHeapMiB": null },
-    { "id": "merge-50k-plus-50k", "operation": "merge", "rows": [50000, 50000], "seed": 202, "maxMedianMs": null, "maxRetainedHeapMiB": null },
-    { "id": "validate-10k", "operation": "validate", "rows": [10000], "seed": 301, "maxMedianMs": null, "maxRetainedHeapMiB": null },
-    { "id": "validate-50k", "operation": "validate", "rows": [50000], "seed": 302, "maxMedianMs": null, "maxRetainedHeapMiB": null }
+    { "id": "clean-10k", "operation": "clean", "rows": [10000], "seed": 101, "timingEnforced": true, "maxMedianMs": 75, "maxRetainedHeapMiB": 4 },
+    { "id": "clean-50k", "operation": "clean", "rows": [50000], "seed": 102, "timingEnforced": true, "maxMedianMs": 250, "maxRetainedHeapMiB": 16 },
+    { "id": "merge-10k-plus-10k", "operation": "merge", "rows": [10000, 10000], "seed": 201, "timingEnforced": false, "maxMedianMs": null, "maxRetainedHeapMiB": 4 },
+    { "id": "merge-50k-plus-50k", "operation": "merge", "rows": [50000, 50000], "seed": 202, "timingEnforced": true, "maxMedianMs": 600, "maxRetainedHeapMiB": 17 },
+    { "id": "validate-10k", "operation": "validate", "rows": [10000], "seed": 301, "timingEnforced": false, "maxMedianMs": null, "maxRetainedHeapMiB": 4 },
+    { "id": "validate-50k", "operation": "validate", "rows": [50000], "seed": 302, "timingEnforced": true, "maxMedianMs": 300, "maxRetainedHeapMiB": 13 }
   ]
 }

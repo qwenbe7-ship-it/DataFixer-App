@@ -6,6 +6,7 @@ export interface BenchmarkCaseDefinition {
   operation: 'clean' | 'merge' | 'validate';
   rows: number[];
   seed: number;
+  timingEnforced: boolean;
   maxMedianMs: number | null;
   maxRetainedHeapMiB: number | null;
 }
@@ -14,6 +15,7 @@ export interface BenchmarkCaseResult {
   id: string;
   operation: BenchmarkCaseDefinition['operation'];
   rows: number[];
+  timingEnforced: boolean;
   timingsMs: number[];
   medianMs: number;
   heapBeforeBytes: number[];

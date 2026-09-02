@@ -142,13 +142,16 @@ async function measureCase(caseDef: BenchmarkCaseDefinition): Promise<BenchmarkC
   const retainedHeapDeltaMiB = measurements.map((item) => item.retainedHeapMiB);
   const medianMs = median(timingsMs);
   const maxRetainedHeapMiB = Math.max(...retainedHeapDeltaMiB);
-  const timingPass = !manifest.enforceBudgets || (caseDef.maxMedianMs !== null && medianMs <= caseDef.maxMedianMs);
+  const timingPass = !manifest.enforceBudgets
+    || !caseDef.timingEnforced
+    || (caseDef.maxMedianMs !== null && medianMs <= caseDef.maxMedianMs);
   const heapPass = !manifest.enforceBudgets
     || (caseDef.maxRetainedHeapMiB !== null && maxRetainedHeapMiB <= caseDef.maxRetainedHeapMiB);
   return {
     id: caseDef.id,
     operation: caseDef.operation,
     rows: [...caseDef.rows],
+    timingEnforced: caseDef.timingEnforced,
     timingsMs,
     medianMs,
     heapBeforeBytes,
@@ -163,12 +166,16 @@ async function measureCase(caseDef: BenchmarkCaseDefinition): Promise<BenchmarkC
 
 function assertEnforcedBudgets(caseDef: BenchmarkCaseDefinition, result: BenchmarkCaseResult): void {
   if (!manifest.enforceBudgets) return;
-  if (caseDef.maxMedianMs === null) throw new Error(`${caseDef.id} missing timing budget`);
+  if (caseDef.timingEnforced) {
+    if (caseDef.maxMedianMs === null) throw new Error(`${caseDef.id} missing timing budget`);
+    expect(
+      result.medianMs,
+      `${caseDef.id} median ${result.medianMs.toFixed(2)}ms exceeds ${caseDef.maxMedianMs}ms budget`,
+    ).toBeLessThanOrEqual(caseDef.maxMedianMs);
+  } else {
+    expect(caseDef.maxMedianMs, `${caseDef.id} observational timing must not carry a gate budget`).toBeNull();
+  }
   if (caseDef.maxRetainedHeapMiB === null) throw new Error(`${caseDef.id} missing retained-heap budget`);
-  expect(
-    result.medianMs,
-    `${caseDef.id} median ${result.medianMs.toFixed(2)}ms exceeds ${caseDef.maxMedianMs}ms budget`,
-  ).toBeLessThanOrEqual(caseDef.maxMedianMs);
   expect(
     result.maxRetainedHeapMiB,
     `${caseDef.id} retained heap ${result.maxRetainedHeapMiB.toFixed(2)}MiB exceeds ${caseDef.maxRetainedHeapMiB}MiB budget`,
