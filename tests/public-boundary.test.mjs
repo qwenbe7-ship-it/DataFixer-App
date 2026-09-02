@@ -46,6 +46,19 @@ test('rejects internal commercial language and high-confidence credentials in tr
   ]);
 });
 
+test('policy definition files are exempt only from commercial self-matches', () => {
+  const channel = ['Fiv', 'err'].join('');
+  const githubToken = ['github_', 'pat_', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnop'].join('');
+  const findings = findForbiddenContent([
+    { path: 'scripts/verify-public-boundary.mjs', content: `blocked label ${channel}` },
+    { path: 'tests/public-boundary.test.mjs', content: `fixture ${channel}; token ${githubToken}` },
+  ]);
+
+  assert.deepEqual(findings.map(({ path, rule }) => ({ path, rule })), [
+    { path: 'tests/public-boundary.test.mjs', rule: 'github-token' },
+  ]);
+});
+
 test('allows public product documentation and obvious examples', () => {
   assert.deepEqual(findForbiddenContent([
     { path: 'README.md', content: 'Internal commercial strategy is intentionally kept outside this repository.' },
