@@ -38,6 +38,10 @@ EXPECTED_CASE_IDS = {
 }
 
 
+def positive_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0
+
+
 def validate_manifest(errors: list[str]) -> None:
     path = ROOT / 'tests/performance/baseline.json'
     if not path.is_file():
@@ -53,11 +57,11 @@ def validate_manifest(errors: list[str]) -> None:
     calibration = payload.get('calibration')
     if not isinstance(calibration, dict):
         errors.append('performance baseline calibration metadata missing')
-    else:
-        if calibration.get('node') != '22.16.0':
-            errors.append('performance baseline calibration node must be 22.16.0')
-        if calibration.get('platform') != 'github-ubuntu':
-            errors.append('performance baseline calibration platform must be github-ubuntu')
+        calibration = {}
+    if calibration.get('node') != '22.16.0':
+        errors.append('performance baseline calibration node must be 22.16.0')
+    if calibration.get('platform') != 'github-ubuntu':
+        errors.append('performance baseline calibration platform must be github-ubuntu')
 
     cases = payload.get('cases')
     if not isinstance(cases, list):
@@ -69,14 +73,27 @@ def validate_manifest(errors: list[str]) -> None:
 
     enforce = payload.get('enforceBudgets') is True
     if enforce:
-        for case in cases:
-            if not isinstance(case, dict):
-                errors.append('performance baseline case must be an object')
-                continue
-            if not isinstance(case.get('maxMedianMs'), (int, float)) or case.get('maxMedianMs') <= 0:
-                errors.append(f"{case.get('id', '<unknown>')} must have a positive maxMedianMs when budgets are enforced")
-            if not isinstance(case.get('maxRetainedHeapMiB'), (int, float)) or case.get('maxRetainedHeapMiB') <= 0:
-                errors.append(f"{case.get('id', '<unknown>')} must have a positive maxRetainedHeapMiB when budgets are enforced")
+        run_ids = calibration.get('runIds')
+        if not isinstance(run_ids, list) or len(run_ids) < 3 or not all(isinstance(value, int) and value > 0 for value in run_ids):
+            errors.append('enforced performance baseline requires at least three positive calibration run IDs')
+
+    for case in cases:
+        if not isinstance(case, dict):
+            errors.append('performance baseline case must be an object')
+            continue
+        case_id = case.get('id', '<unknown>')
+        timing_enforced = case.get('timingEnforced')
+        if not isinstance(timing_enforced, bool):
+            errors.append(f'{case_id} must declare boolean timingEnforced')
+            continue
+        timing_budget = case.get('maxMedianMs')
+        if timing_enforced:
+            if enforce and not positive_number(timing_budget):
+                errors.append(f'{case_id} must have a positive maxMedianMs when timing is enforced')
+        elif timing_budget is not None:
+            errors.append(f'{case_id} observational timing must keep maxMedianMs null')
+        if enforce and not positive_number(case.get('maxRetainedHeapMiB')):
+            errors.append(f'{case_id} must have a positive maxRetainedHeapMiB when budgets are enforced')
 
     is_main_push = os.environ.get('GITHUB_EVENT_NAME') == 'push' and os.environ.get('GITHUB_REF') == 'refs/heads/main'
     if is_main_push and not enforce:
