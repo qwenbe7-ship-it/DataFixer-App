@@ -1,51 +1,53 @@
 # DataFixer Active Technical Debt
 
-Only active debt/blockers belong here. Every item needs severity, trigger and an objective exit criterion.
+Only active debt or release-process gaps belong here. Resolved bootstrap and browser blockers are intentionally removed from the active list.
 
-## TD-001 — Official npm dependency bootstrap unavailable
+## Verified baseline
 
-- **Severity:** P0 release blocker
-- **State:** BLOCKED; bootstrap workflow is ready, but no dedicated DataFixer remote repository/real lockfile exists yet
-- **Trigger:** any release or real production verification
-- **Impact:** Vitest, browser mode, ESLint, Vite build, Playwright project runner and real SheetJS package cannot execute here.
-- **Exit criterion:** dedicated DataFixer GitHub repo runs `bootstrap-lockfile.yml`, generated lock passes validation/official gates, reviewed `package-lock.json` is committed, and normal `production-gates.yml` is green.
+- Public repository: `qwenbe7-ship-it/DataFixer-App`
+- Verified `main`: `11b8073991e015fb22789e409e8e88517bfe6982`
+- GitHub Actions run: `33583805040`
+- Harness: PASS
+- Official production gates: PASS
+- Unit tests: 74 PASS
+- Browser tests: 4 PASS
+- Playwright E2E: 33 PASS across Chrome, Edge and Firefox
+- Vercel Git status on the verified commit: `success` / `Deployment has completed`
+- Vercel target project: `qwenbe/data-fixer-app`
 
-## TD-002 — Real XLSX binary round-trip not yet proven
+## TD-003 — Live Vercel host privacy/header capture pending
 
-- **Severity:** P0 release blocker
-- **State:** BLOCKED
-- **Trigger:** XLSX import/export release claim
-- **Impact:** local adapter tests verify the interface, not SheetJS binary correctness.
-- **Exit criterion:** official SheetJS 0.20.3 reads/writes representative XLSX fixtures and round-trip tests PASS.
-
-## TD-003 — Production browser privacy capture pending
-
-- **Severity:** P0 release blocker
-- **State:** BLOCKED
+- **Severity:** P0 release-verification gate for a public/customer launch
+- **State:** OPEN; local production-preview privacy verification is PASS, but the deployed Vercel response has not yet been captured directly
 - **Trigger:** public/customer release
-- **Impact:** static scan is PASS but production browser network behavior is not yet captured.
-- **Exit criterion:** Chromium/Firefox production E2E shows zero off-origin and zero write requests during file processing; hosting CSP header verified.
-
-## TD-004 — Browser matrix incomplete
-
-- **Severity:** P1 release blocker
-- **State:** BLOCKED
-- **Trigger:** release candidate
-- **Exit criterion:** promised Chrome, Edge and Firefox flows PASS with downloads and offline continuity.
+- **Evidence already PASS:** zero non-GET/off-origin requests and zero customer-data request/console leaks in Playwright; offline continuation works; repository `vercel.json` defines CSP `frame-ancestors 'none'`, `nosniff`, `DENY`, `no-referrer`, and restrictive Permissions-Policy
+- **Remaining gap:** verify those headers and privacy behavior against the actual Vercel production URL
+- **Exit criterion:** a live-host browser/curl capture confirms required response headers, and a browser smoke test against the deployed origin confirms no customer spreadsheet bytes or derived values are transmitted
 
 ## TD-005 — Performance baseline not versioned
 
 - **Severity:** P2
 - **State:** OPEN
-- **Trigger:** large-file/algorithm changes
-- **Impact:** functional regressions are caught more strongly than throughput regressions.
-- **Exit criterion:** versioned benchmark dataset and threshold report for representative row counts.
+- **Trigger:** large-file or algorithm changes
+- **Impact:** functional regressions are caught more strongly than throughput regressions
+- **Exit criterion:** versioned benchmark dataset plus objective timing/memory thresholds for representative row counts
 
+## TD-007 — `main` protection/ruleset not configured
 
-## TD-006 — Dedicated remote CI repository not provisioned
-
-- **Severity:** P0 release blocker
+- **Severity:** P1 release-process gap
 - **State:** OPEN
-- **Trigger:** first GitHub-hosted production bootstrap
-- **Impact:** the prepared network-enabled Actions workflows cannot execute until the verified local Git history is pushed to a dedicated DataFixer repository.
-- **Exit criterion:** dedicated DataFixer repository exists, current `main` is pushed without reusing unrelated repositories, and `bootstrap-lockfile.yml` can be dispatched.
+- **Evidence:** GitHub reports `main` as `protected: false` and repository rulesets are empty
+- **Impact:** CI is green, but GitHub does not yet enforce PR-only changes or required checks at the repository boundary
+- **Exit criterion:** an active `main` ruleset requires pull requests and the DataFixer production-gate checks, while blocking force-push/deletion
+
+## TD-008 — Production bundle size warning
+
+- **Severity:** P2
+- **State:** OPEN; non-blocking
+- **Evidence:** Vite reports the main JavaScript bundle at about 637 kB (about 205 kB gzip) and the data worker at about 522 kB, primarily because SheetJS is required for browser-side XLSX processing
+- **Impact:** no correctness failure; potential initial-load and worker-start cost
+- **Exit criterion:** measured code-splitting/lazy-loading improvement removes the warning or a benchmark demonstrates the current bundle is the better trade-off and the warning threshold is documented accordingly
+
+## Resolved blockers
+
+The following earlier P0 items are closed by the verified public repository and GitHub-hosted production run: canonical lockfile/bootstrap, real SheetJS execution, XLSX import/export verification, Chrome/Edge/Firefox browser matrix, remote official CI, and production build artifact generation.
