@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const exactForbidden = new Set([
@@ -22,6 +23,19 @@ const secretBasenamePatterns = [
   /^service-account(?:\..+)?\.json$/i,
 ];
 
+const forbiddenContentRules = [
+  {
+    rule: 'commercial-strategy',
+    pattern: /\b(?:Fiverr|Upwork)\b|\$(?:29|69)\b|₩39,?000|판매\s*채널|첫\s*5건|founding customer/i,
+  },
+  { rule: 'private-key', pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/ },
+  { rule: 'github-token', pattern: /\b(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})\b/ },
+  { rule: 'openai-token', pattern: /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/ },
+  { rule: 'aws-access-key', pattern: /\bAKIA[0-9A-Z]{16}\b/ },
+  { rule: 'slack-token', pattern: /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/ },
+  { rule: 'google-api-key', pattern: /\bAIza[0-9A-Za-z_-]{35}\b/ },
+];
+
 function normalizePath(path) {
   return path.replaceAll('\\', '/').replace(/^\.\//, '');
 }
@@ -35,16 +49,39 @@ export function findForbiddenPaths(paths) {
   }).sort();
 }
 
+export function findForbiddenContent(files) {
+  const findings = [];
+  for (const file of files) {
+    for (const { rule, pattern } of forbiddenContentRules) {
+      if (pattern.test(file.content)) findings.push({ path: normalizePath(file.path), rule });
+    }
+  }
+  return findings.sort((left, right) => left.path.localeCompare(right.path) || left.rule.localeCompare(right.rule));
+}
+
 function trackedPaths() {
   const output = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' });
   return output.split('\0').filter(Boolean);
 }
 
+function trackedTextFiles(paths) {
+  const files = [];
+  for (const path of paths) {
+    const bytes = readFileSync(path);
+    if (bytes.includes(0)) continue;
+    files.push({ path, content: bytes.toString('utf8') });
+  }
+  return files;
+}
+
 function main() {
-  const forbidden = findForbiddenPaths(trackedPaths());
-  if (forbidden.length > 0) {
+  const paths = trackedPaths();
+  const forbiddenPaths = findForbiddenPaths(paths);
+  const forbiddenContent = findForbiddenContent(trackedTextFiles(paths));
+  if (forbiddenPaths.length > 0 || forbiddenContent.length > 0) {
     console.error('PUBLIC_BOUNDARY_FAIL');
-    for (const path of forbidden) console.error(`- ${path}`);
+    for (const path of forbiddenPaths) console.error(`- forbidden-path: ${path}`);
+    for (const { path, rule } of forbiddenContent) console.error(`- forbidden-content(${rule}): ${path}`);
     process.exit(1);
   }
   console.log('PUBLIC_BOUNDARY_PASS');
