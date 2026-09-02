@@ -23,6 +23,11 @@ const secretBasenamePatterns = [
   /^service-account(?:\..+)?\.json$/i,
 ];
 
+const commercialPolicyExemptPaths = new Set([
+  'scripts/verify-public-boundary.mjs',
+  'tests/public-boundary.test.mjs',
+]);
+
 const commercialChannelPattern = [
   ['Fiv', 'err'].join(''),
   ['Up', 'work'].join(''),
@@ -60,8 +65,10 @@ export function findForbiddenPaths(paths) {
 export function findForbiddenContent(files) {
   const findings = [];
   for (const file of files) {
+    const path = normalizePath(file.path);
     for (const { rule, pattern } of forbiddenContentRules) {
-      if (pattern.test(file.content)) findings.push({ path: normalizePath(file.path), rule });
+      if (rule === 'commercial-strategy' && commercialPolicyExemptPaths.has(path)) continue;
+      if (pattern.test(file.content)) findings.push({ path, rule });
     }
   }
   return findings.sort((left, right) => left.path.localeCompare(right.path) || left.rule.localeCompare(right.rule));
