@@ -44,11 +44,18 @@ export function generateCleanDataset(rows: number, seed: number): Dataset {
   };
 }
 
+function mergeKeyIndex(sourceId: 'source-a' | 'source-b', rows: number, index: number): number {
+  if (sourceId === 'source-a') return index;
+  if (index > 1 && index % 211 === 0) return index - 2;
+  if (index % 5 === 0) return rows + index;
+  return index;
+}
+
 function generateMergeSource(sourceId: 'source-a' | 'source-b', rows: number, seed: number): Dataset {
   const random = seededRandom(seed);
   const generated: DataRow[] = [];
   for (let index = 0; index < rows; index += 1) {
-    const keyIndex = sourceId === 'source-a' ? index : Math.floor(index * 0.75);
+    const keyIndex = mergeKeyIndex(sourceId, rows, index);
     generated.push(row(sourceId, sourceId, index, {
       id: `K-${keyIndex}`,
       name: `${sourceId}-Name-${index}`,
