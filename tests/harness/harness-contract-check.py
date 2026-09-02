@@ -33,6 +33,7 @@ REQUIRED_FILES = [
     'tests/harness/verify-local-production-unblock-check.py',
     'tests/harness/browser-matrix-contract-check.py',
     'tests/harness/privacy-production-contract-check.py',
+    'tests/harness/performance-baseline-contract-check.py',
     'tests/harness/preflight-contract-check.py',
 ]
 

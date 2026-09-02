@@ -11,6 +11,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test:unit": "vitest run --project unit",
+    "test:performance": "vitest run --project performance",
     "test:browser": "vitest run --project browser",
     "test:e2e": "playwright test",
     "test": "npm run test:unit && npm run test:browser && npm run test:e2e",

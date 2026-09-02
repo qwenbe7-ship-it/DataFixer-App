@@ -8,6 +8,7 @@ node scripts/validate-lockfile.mjs
 
 npm run lint
 npm run test:unit
+npm run test:performance
 npm run test:browser
 npm run build
 npm run test:e2e

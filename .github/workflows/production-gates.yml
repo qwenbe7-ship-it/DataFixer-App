@@ -40,6 +40,8 @@ jobs:
         run: python tests/harness/browser-matrix-contract-check.py
       - name: Privacy production contract
         run: python tests/harness/privacy-production-contract-check.py
+      - name: Performance baseline contract
+        run: python tests/harness/performance-baseline-contract-check.py
       - name: Preflight classification contract
         run: python tests/harness/preflight-contract-check.py
 
@@ -79,6 +81,13 @@ jobs:
         with:
           name: datafixer-verification
           path: verify-report-*.json
+
+      - name: Upload performance evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: datafixer-performance
+          path: benchmark-report.json
 
       - name: Upload production build
         if: ${{ success() }}

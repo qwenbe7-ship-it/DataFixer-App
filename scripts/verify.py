@@ -81,6 +81,7 @@ def local_checks() -> list[dict[str, Any]]:
         ('verify-local-unblock-contract', [py, 'tests/harness/verify-local-production-unblock-check.py']),
         ('browser-matrix-contract', [py, 'tests/harness/browser-matrix-contract-check.py']),
         ('privacy-production-contract', [py, 'tests/harness/privacy-production-contract-check.py']),
+        ('performance-baseline-contract', [py, 'tests/harness/performance-baseline-contract-check.py']),
         ('preflight-contract', [py, 'tests/harness/preflight-contract-check.py']),
         ('local-regression', ['./tests/local/run-regression.sh']),
     ]
