@@ -69,7 +69,7 @@ The manifest is the versioned benchmark dataset contract. Raw rows are generated
 
 Add `tests/performance/fixtures.ts`.
 
-It will use a tiny repository-owned seeded PRNG and fixed schemas. No random system time, UUID, locale, network call or external fixture is permitted. Given the same manifest, it must create byte-for-byte-equivalent logical rows on every run.
+It will use a tiny repository-owned seeded PRNG and fixed schemas. No random system time, UUID, locale, network call or external fixture is permitted. Given the same manifest, it must create the same ordered row objects on every run. A determinism test will canonicalize the generated rows and compare a fixed SHA-256 fixture hash so generator drift is explicit and reviewable.
 
 The generated data intentionally includes a stable mix of:
 
@@ -103,7 +103,7 @@ The benchmark process must not run cases concurrently.
 
 ### 4. Machine-readable evidence
 
-Add `tests/performance/report.ts` or equivalent focused helper that writes `benchmark-report.json` containing:
+Add `tests/performance/report.ts`, which writes `benchmark-report.json` containing:
 
 - schema version;
 - commit SHA when available;
@@ -128,7 +128,7 @@ Update `scripts/production-gates.sh` so the performance gate runs after unit tes
 
 Update the unified harness contract so `scripts/verify.py official` continues to surface performance failure through `official-production-gates` without introducing a parallel release path.
 
-Update the GitHub production workflow artifact upload to include `benchmark-report.json` with the existing verification evidence, or add a separately named `datafixer-performance` artifact if keeping evidence types separate is clearer during implementation.
+Update `.github/workflows/production-gates.yml` to upload `benchmark-report.json` as a dedicated `datafixer-performance` artifact. Existing `datafixer-verification` and `datafixer-dist` artifacts remain unchanged.
 
 ## Calibration strategy
 
@@ -147,7 +147,7 @@ If a case shows high variance (max median / min median > 1.35), it is not suitab
 
 1. Add a harness contract test that expects the performance project, manifest, package script and production-gate invocation. Confirm RED.
 2. Add manifest/generator/runner/report plumbing. Confirm the contract turns GREEN.
-3. Add generator determinism tests.
+3. Add generator determinism tests, including the fixed canonical fixture hash.
 4. Add benchmark-report schema tests.
 5. Run calibration in trusted GitHub Actions.
 6. Commit objective budgets derived from those runs.
@@ -183,7 +183,7 @@ TD-005 is closed only when all of the following are true:
 - Clean, Merge and Validate have 10k and 50k-class cases;
 - timing and heap budgets are derived from repeated trusted CI measurements;
 - required performance assertions are active in `production-gates.sh`;
-- machine-readable benchmark evidence is retained in CI;
+- `datafixer-performance` retains the machine-readable benchmark report in CI;
 - full production gates pass;
 - merged `main` deploys successfully and exact-SHA live-host verification remains PASS;
 - `docs/TECH_DEBT.md` marks TD-005 resolved with the measured baseline evidence.
