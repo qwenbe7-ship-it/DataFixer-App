@@ -16,4 +16,15 @@ describe('performance fixtures', () => {
     expect(generateMergeDatasets(30, 201)).toEqual(generateMergeDatasets(30, 201));
     expect(generateValidateDataset(30, 301)).toEqual(generateValidateDataset(30, 301));
   });
+
+  it('keeps merge fixtures representative with both overlap and misses', () => {
+    const [left, right] = generateMergeDatasets(100, 201);
+    const leftKeys = new Set(left.rows.map((item) => item.values.id));
+    const rightKeys = right.rows.map((item) => item.values.id);
+
+    expect(rightKeys.some((key) => leftKeys.has(key))).toBe(true);
+    expect(rightKeys.some((key) => !leftKeys.has(key))).toBe(true);
+    expect(new Set([...left.rows.map((item) => item.values.id), ...rightKeys]).size)
+      .toBeLessThan(left.rows.length + right.rows.length);
+  });
 });
