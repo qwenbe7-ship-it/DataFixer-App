@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const productionCsp = [
@@ -14,8 +14,36 @@ const productionCsp = [
   "frame-ancestors 'none'",
 ].join('; ');
 
+function datafixerBuildProvenance(): Plugin {
+  const buildSha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
+
+  if (buildSha && !/^[0-9a-f]{40}$/i.test(buildSha)) {
+    throw new Error('VERCEL_GIT_COMMIT_SHA must be a full 40-character Git SHA');
+  }
+
+  return {
+    name: 'datafixer-build-provenance',
+    transformIndexHtml(html) {
+      if (!buildSha) return html;
+      return {
+        html,
+        tags: [
+          {
+            tag: 'meta',
+            attrs: {
+              name: 'datafixer-build-sha',
+              content: buildSha,
+            },
+            injectTo: 'head',
+          },
+        ],
+      };
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), datafixerBuildProvenance()],
   worker: { format: 'es' },
   preview: {
     headers: {
