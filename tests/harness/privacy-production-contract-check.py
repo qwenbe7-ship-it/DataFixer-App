@@ -5,6 +5,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 privacy = (ROOT / 'tests/e2e/privacy.spec.ts').read_text(encoding='utf-8')
 vite = (ROOT / 'vite.config.ts').read_text(encoding='utf-8')
+playwright = (ROOT / 'playwright.config.ts').read_text(encoding='utf-8')
+live_script_path = ROOT / 'scripts/verify-live-host.mjs'
+live_workflow_path = ROOT / '.github/workflows/live-host-verification.yml'
+live_xlsx_path = ROOT / 'tests/e2e/live-xlsx.spec.ts'
 errors: list[str] = []
 
 for marker in [
@@ -28,6 +32,48 @@ if "frame-ancestors 'none'" not in vite:
     errors.append('Vite production preview CSP must include frame-ancestors none')
 if 'preview:' not in vite or 'Content-Security-Policy' not in vite:
     errors.append('Vite production preview must emit CSP as an HTTP response header')
+
+if 'DATAFIXER_BASE_URL' not in playwright:
+    errors.append('Playwright config must support DATAFIXER_BASE_URL for live-host verification')
+if 'webServer' not in playwright:
+    errors.append('Playwright config must retain the local preview webServer path')
+
+if not live_script_path.exists():
+    errors.append('live-host header verifier script is missing')
+else:
+    live_script = live_script_path.read_text(encoding='utf-8')
+    for marker in [
+        'content-security-policy',
+        "frame-ancestors 'none'",
+        'x-content-type-options',
+        'x-frame-options',
+        'referrer-policy',
+        'permissions-policy',
+    ]:
+        if marker not in live_script.lower():
+            errors.append(f'live-host verifier missing marker: {marker}')
+
+if not live_xlsx_path.exists():
+    errors.append('live XLSX browser smoke test is missing')
+else:
+    live_xlsx = live_xlsx_path.read_text(encoding='utf-8')
+    for marker in ['XLSX.utils.book_new', 'book.xlsx', 'Row reconciliation passed']:
+        if marker not in live_xlsx:
+            errors.append(f'live XLSX smoke test missing marker: {marker}')
+
+if not live_workflow_path.exists():
+    errors.append('live-host verification workflow is missing')
+else:
+    live_workflow = live_workflow_path.read_text(encoding='utf-8')
+    for marker in [
+        'verify-live-host.mjs',
+        'DATAFIXER_BASE_URL',
+        'privacy.spec.ts',
+        'clean.spec.ts',
+        'live-xlsx.spec.ts',
+    ]:
+        if marker not in live_workflow:
+            errors.append(f'live-host workflow missing marker: {marker}')
 
 if errors:
     for error in errors:
