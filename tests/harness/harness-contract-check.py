@@ -26,6 +26,7 @@ REQUIRED_FILES = [
     'scripts/verify.py',
     '.github/workflows/production-gates.yml',
     '.github/workflows/bootstrap-lockfile.yml',
+    '.github/workflows/main-branch-guard.yml',
     'scripts/validate-lockfile.mjs',
     'tests/harness/lockfile-validator-check.py',
     'tests/harness/production-bootstrap-workflow-check.py',
