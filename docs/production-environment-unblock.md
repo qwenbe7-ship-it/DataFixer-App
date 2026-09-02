@@ -4,15 +4,17 @@
 
 The development container can still be unable to reach external package/deployment hosts, but that limitation is no longer a DataFixer release blocker. The trusted network-enabled path is the public GitHub repository and its GitHub-hosted Actions runner.
 
-Verified public baseline:
+Runtime verification baseline:
 
 - repository: `qwenbe7-ship-it/DataFixer-App`;
-- `main`: `11b8073991e015fb22789e409e8e88517bfe6982`;
-- normal production workflow run: `33583805040`;
+- last runtime-affecting baseline commit: `11b8073991e015fb22789e409e8e88517bfe6982`;
+- GitHub Actions evidence run: `33583805040`;
 - harness: PASS;
 - official production gates: PASS;
-- `datafixer-verification` and `datafixer-dist` artifacts: generated from the same clean commit;
+- `datafixer-verification` and `datafixer-dist` artifacts: generated from the same clean runtime baseline;
 - Vercel Git status: `success` with `Deployment has completed` for project `qwenbe/data-fixer-app`.
+
+Documentation-only commits may advance `main` without changing this runtime baseline. Update the baseline only when application source, dependencies, build/hosting configuration, workflows, or tests materially change.
 
 ## Production verification architecture
 
@@ -66,19 +68,20 @@ The already-opened application is also verified to complete processing and downl
 
 ## Vercel deployment state
 
-GitHub commit status proves that the verified `main` commit is connected to Vercel project `qwenbe/data-fixer-app` and that Vercel reported `Deployment has completed`. The repository `vercel.json` defines the production CSP, anti-framing, MIME-sniffing, referrer and Permissions-Policy headers plus immutable caching for hashed assets.
+GitHub commit status proves that the runtime baseline is connected to Vercel project `qwenbe/data-fixer-app` and that Vercel reported `Deployment has completed`. The repository `vercel.json` defines the production CSP, anti-framing, MIME-sniffing, referrer and Permissions-Policy headers plus immutable caching for hashed assets.
 
 The remaining deployment verification is intentionally narrower: directly capture the live production response and repeat a browser privacy smoke test against the deployed Vercel origin. This verifies hosting behavior rather than build correctness.
 
 ## Current release path
 
-For a normal change:
+For a normal runtime-affecting change:
 
 1. create a branch and pull request;
 2. require `DataFixer production gates` to pass;
 3. review the exact commit and merge;
 4. confirm the Vercel status on the merged SHA is successful;
 5. verify the live production headers and browser privacy behavior;
-6. retain the verification/build artifacts for the release evidence trail.
+6. retain the verification/build artifacts for the release evidence trail;
+7. update the runtime verification baseline in current-state documentation.
 
 Repository protection should enforce steps 1–2. At present GitHub still reports `main` as unprotected, so an active `main` ruleset remains an operational release-process gap.
