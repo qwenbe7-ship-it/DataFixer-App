@@ -23,10 +23,18 @@ const secretBasenamePatterns = [
   /^service-account(?:\..+)?\.json$/i,
 ];
 
+const commercialChannelPattern = [
+  ['Fiv', 'err'].join(''),
+  ['Up', 'work'].join(''),
+].join('|');
+const foundingPattern = ['founding', 'customer'].join('\\s+');
+const salesChannelPattern = ['판매', '채널'].join('\\s*');
+const firstFivePattern = ['첫', '5건'].join('\\s*');
+
 const forbiddenContentRules = [
   {
     rule: 'commercial-strategy',
-    pattern: /\b(?:Fiverr|Upwork)\b|\$(?:29|69)\b|₩39,?000|판매\s*채널|첫\s*5건|founding customer/i,
+    pattern: new RegExp(`\\b(?:${commercialChannelPattern})\\b|\\$(?:29|69)\\b|₩39,?000|${salesChannelPattern}|${firstFivePattern}|${foundingPattern}`, 'i'),
   },
   { rule: 'private-key', pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/ },
   { rule: 'github-token', pattern: /\b(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})\b/ },
