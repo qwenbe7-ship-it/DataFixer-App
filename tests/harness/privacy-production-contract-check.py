@@ -32,6 +32,9 @@ if "frame-ancestors 'none'" not in vite:
     errors.append('Vite production preview CSP must include frame-ancestors none')
 if 'preview:' not in vite or 'Content-Security-Policy' not in vite:
     errors.append('Vite production preview must emit CSP as an HTTP response header')
+for marker in ['VERCEL_GIT_COMMIT_SHA', 'datafixer-build-sha', 'transformIndexHtml']:
+    if marker not in vite:
+        errors.append(f'Vite build provenance missing marker: {marker}')
 
 if 'DATAFIXER_BASE_URL' not in playwright:
     errors.append('Playwright config must support DATAFIXER_BASE_URL for live-host verification')
@@ -49,8 +52,10 @@ else:
         'x-frame-options',
         'referrer-policy',
         'permissions-policy',
+        'DATAFIXER_EXPECTED_SHA',
+        'datafixer-build-sha',
     ]:
-        if marker not in live_script.lower():
+        if marker.lower() not in live_script.lower():
             errors.append(f'live-host verifier missing marker: {marker}')
 
 if not live_xlsx_path.exists():
@@ -68,12 +73,18 @@ else:
     for marker in [
         'verify-live-host.mjs',
         'DATAFIXER_BASE_URL',
+        'DATAFIXER_EXPECTED_SHA',
         'privacy.spec.ts',
         'clean.spec.ts',
         'live-xlsx.spec.ts',
+        'ref:',
+        'github.event.workflow_run.head_sha',
+        'concurrency:',
     ]:
         if marker not in live_workflow:
             errors.append(f'live-host workflow missing marker: {marker}')
+    if 'pull_request:' in live_workflow and 'preview_url' not in live_workflow.lower():
+        errors.append('live-host workflow must not test the production alias for pull requests without explicit preview URL discovery')
 
 if errors:
     for error in errors:
