@@ -1,0 +1,4 @@
+product_sku,stock,supplier
+A-1,10,North
+B-2,20,South
+B-2,25,Backup

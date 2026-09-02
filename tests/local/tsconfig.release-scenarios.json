@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target":"ES2022", "module":"CommonJS", "moduleResolution":"Node", "strict":true,
+    "esModuleInterop":true, "skipLibCheck":true, "lib":["ES2022","DOM"], "outDir":"/tmp/datafixer-release-scenarios"
+  },
+  "include":[
+    "../../src/domain/*.ts", "../../src/rules/*.ts", "../../src/evidence/*.ts",
+    "../../src/app/process-job.ts", "../../src/app/app-reducer.ts",
+    "../../src/export/workbook-model.ts", "../../src/export/html-report.ts",
+    "../../src/export/settings-export.ts", "../../src/export/job-settings.ts",
+    "release-scenarios-check.ts"
+  ]
+}

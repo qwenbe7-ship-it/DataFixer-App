@@ -1,0 +1,2 @@
+email,age,status,code,min_value,max_value,name
+valid@example.com,30,ACTIVE,AB-001,1,2,Alice

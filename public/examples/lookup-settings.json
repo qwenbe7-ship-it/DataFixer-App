@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "mode": "lookup",
+  "rules": [],
+  "mergeSettings": null,
+  "lookupSettings": {
+    "leftKeyColumns": [
+      "sku"
+    ],
+    "rightKeyColumns": [
+      "product_sku"
+    ],
+    "rightValueMap": {
+      "stock": "inventory_stock",
+      "supplier": "inventory_supplier"
+    }
+  }
+}

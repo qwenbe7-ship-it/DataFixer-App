@@ -1,0 +1,4 @@
+row,status,rule,reason
+2,CHANGED,trim-customer,Removed leading and trailing whitespace
+4,REMOVED,dedupe-order,Duplicate order ID removed
+5,REJECTED,parse-amount,Value could not be parsed as a valid number

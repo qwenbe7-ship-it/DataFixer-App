@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "CommonJS", "moduleResolution": "Node", "strict": true,
+    "lib": ["ES2022", "DOM"], "skipLibCheck": true, "outDir": "/tmp/datafixer-hash"
+  },
+  "include": ["../../src/evidence/hash.ts", "hash-check.ts"]
+}

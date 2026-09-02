@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-sales-samples"
+  },
+  "include": [
+    "../../src/domain/**/*.ts",
+    "../../src/export/settings-export.ts",
+    "../../src/export/job-settings.ts",
+    "./sales-samples-check.ts",
+    "./node-fs-stub.d.ts",
+    "./node-stub.d.ts"
+  ]
+}

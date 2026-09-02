@@ -1,0 +1,59 @@
+name: DataFixer bootstrap lockfile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+
+      - name: Resolve pinned dependencies into lockfile
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Validate generated lockfile
+        run: node scripts/validate-lockfile.mjs
+
+      - name: Clean deterministic install from generated lock
+        run: npm ci --ignore-scripts
+
+      - name: Install Playwright browsers
+        run: ./node_modules/.bin/playwright install --with-deps chromium chrome msedge firefox
+
+      - name: Local harness with real project toolchain
+        run: python scripts/verify.py local --report verify-report-local.json
+
+      - name: Official production gates
+        run: python scripts/verify.py official --report verify-report-official.json
+
+      - name: Upload verified lockfile candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: datafixer-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+
+      - name: Upload verification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: datafixer-bootstrap-verification
+          path: verify-report-*.json
+          if-no-files-found: warn
+
+      - name: Upload production build
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: datafixer-bootstrap-dist
+          path: dist/
+          if-no-files-found: error

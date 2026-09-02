@@ -1,0 +1,18 @@
+node_modules
+dist
+.vite
+playwright-report
+test-results
+*.local
+.DS_Store
+
+# Local harness build artifacts
+.local-test-*/
+.worktrees/
+verify-report.json
+coverage/
+
+# Python harness artifacts
+__pycache__/
+*.pyc
+verify-report*.json

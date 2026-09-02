@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "../../.local-test-clean-rules"
+  },
+  "include": [
+    "../../src/domain/types.ts",
+    "../../src/domain/factories.ts",
+    "../../src/rules/clean.ts",
+    "./clean-rules-check.ts"
+  ]
+}

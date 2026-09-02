@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target":"ES2022","module":"CommonJS","moduleResolution":"Node","strict":true,"skipLibCheck":true,"outDir":"../../.local-test-job-settings"},
+  "include": ["../../src/export/job-settings.ts","../../src/export/settings-export.ts","../../src/domain/**/*.ts","job-settings-check.ts"]
+}

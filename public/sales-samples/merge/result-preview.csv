@@ -1,0 +1,4 @@
+id,amount,source
+N-1001,100,merge-north.csv
+DUP-1,50,merge-north.csv
+S-2001,200,merge-south.csv

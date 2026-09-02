@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DataFixer V1 — 비개발자 사용자 검수 시뮬레이션</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#151515;background:#f4f5f7}*{box-sizing:border-box}body{margin:0}.shell{max-width:1180px;margin:0 auto;padding:28px}.review-banner{background:#fff3cd;border:1px solid #e7c95c;border-radius:12px;padding:14px 16px;margin-bottom:18px}.review-banner strong{display:block;margin-bottom:4px}.header{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:18px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:#666}.header h1{margin:.25rem 0;font-size:34px}.header p{margin:.25rem 0;color:#555}.privacy{display:flex;gap:12px;align-items:center;background:#edf7f0;border:1px solid #b8dec2;padding:13px 16px;border-radius:12px;margin:16px 0}.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}.step{background:#e5e7eb;border-radius:999px;padding:8px;text-align:center;font-size:13px;font-weight:700}.step.active{background:#1f2937;color:white}.card{background:#fff;border:1px solid #dedede;border-radius:16px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,.04)}h2{margin-top:0}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mode{border:1px solid #d3d7dd;border-radius:12px;padding:18px;background:#fafafa;cursor:pointer;text-align:left}.mode:hover{border-color:#555}.mode strong{display:block;font-size:18px;margin-bottom:6px}.muted{color:#666}.file-card,.rule-card,.panel{border:1px solid #ddd;border-radius:10px;padding:14px;margin:12px 0}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f7f7f8}.actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px}button{border:0;border-radius:9px;padding:11px 16px;font-weight:700;background:#222;color:white;cursor:pointer}button.secondary{background:#e9eaed;color:#222}.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.summary div{background:#f7f7f8;border-radius:10px;padding:14px}.summary span{display:block;color:#666;font-size:12px}.summary strong{font-size:23px}.download-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.review-box{margin-top:20px;padding:16px;border:1px dashed #aaa;border-radius:12px;background:#fafafa}.review-box h3{margin-top:0}.review-box label{display:block;margin:8px 0}.status{display:inline-block;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700}.changed{background:#e8f0fe}.removed{background:#f3e8ff}.rejected{background:#fee2e2}.unchanged{background:#e5e7eb}.hidden{display:none}@media(max-width:760px){.modes,.summary,.download-grid{grid-template-columns:1fr}.header{display:block}.stepper{font-size:11px}.shell{padding:14px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="review-banner"><strong>사용자 검수용 시뮬레이션</strong>이 파일은 화면 흐름을 검토하기 위한 정적 시뮬레이션입니다. 실제 CSV/XLSX 처리는 하지 않으며 출시 빌드가 아닙니다.</div>
+  <header class="header"><div><div class="eyebrow">LOCAL-FIRST DATA CLEANUP</div><h1>DataFixer</h1><p>CSV·Excel 정리, 통합, 검증을 안전하게 처리합니다.</p></div><label>언어 <select id="language"><option>한국어</option><option>English</option></select></label></header>
+  <div class="privacy">🔒 <strong>파일은 이 기기 밖으로 전송되지 않습니다.</strong><span class="muted">처리는 브라우저 안에서만 수행됩니다.</span></div>
+  <div class="stepper" id="stepper"></div>
+  <main class="card">
+    <section data-page="0">
+      <h2>1. 어떤 작업을 하시겠습니까?</h2>
+      <div class="modes"><button class="mode" data-next="1"><strong>Clean</strong><span class="muted">공백, 숫자, 날짜, 중복 등 지저분한 데이터를 정리합니다.</span></button><button class="mode" data-next="1"><strong>Merge</strong><span class="muted">여러 파일의 열 구조를 맞춰 하나로 합칩니다.</span></button><button class="mode" data-next="1"><strong>Validate</strong><span class="muted">필수값, 자료형, 중복, 범위 등의 오류를 찾습니다.</span></button></div>
+      <div class="review-box"><h3>당신이 볼 것</h3><label>□ 처음 봐도 세 기능의 차이를 이해할 수 있는가?</label><label>□ 개인정보 보호 문구가 충분히 눈에 띄는가?</label></div>
+    </section>
+    <section data-page="1" class="hidden">
+      <h2>2. 파일 선택</h2><p>CSV 또는 XLSX 파일을 선택합니다. 파일당 20MB · 작업당 50MB · 최대 10개</p>
+      <div class="file-card"><strong>clean-orders.csv</strong> · 0.02 MB<p class="muted">Sheet1 · 4행 · 4열</p><div class="table-wrap"><table><thead><tr><th>order_id</th><th>customer</th><th>amount</th><th>date</th></tr></thead><tbody><tr><td>A-001</td><td> Alice </td><td>1,200</td><td>2026/08/31</td></tr><tr><td>A-002</td><td>Bob</td><td>900</td><td>2026-09-01</td></tr></tbody></table></div></div>
+      <div class="review-box"><h3>당신이 볼 것</h3><label>□ 어떤 파일을 선택했는지 바로 알 수 있는가?</label><label>□ 행/열/미리보기가 충분한가?</label><label>□ 파일 제한 안내가 어렵거나 부담스럽지 않은가?</label></div>
+      <div class="actions"><button class="secondary" data-prev="0">이전</button><button data-next="2">계속</button></div>
+    </section>
+    <section data-page="2" class="hidden">
+      <h2>3. 규칙 설정</h2><p class="muted">규칙은 위에서 아래 순서로 실행됩니다.</p>
+      <div class="rule-card"><strong>① 고객명 앞뒤 공백 제거</strong><p>열: customer</p></div><div class="rule-card"><strong>② 금액 숫자 변환</strong><p>열: amount · 천 단위 구분기호 제거</p></div><div class="rule-card"><strong>③ 주문번호 중복 제거</strong><p>기준 열: order_id</p></div>
+      <div class="review-box"><h3>당신이 볼 것</h3><label>□ “규칙”이라는 개념이 비개발자에게 이해되는가?</label><label>□ 어떤 열에 무엇을 하는지 바로 알 수 있는가?</label><label>□ 실행 순서가 중요하다는 설명이 충분한가?</label></div>
+      <div class="actions"><button class="secondary" data-prev="1">이전</button><button data-next="3">시험 실행</button></div>
+    </section>
+    <section data-page="3" class="hidden">
+      <h2>4. 시험 실행</h2><p><strong>샘플 최대 200행만 먼저 확인합니다.</strong> 아직 전체 파일을 처리하지 않았습니다.</p>
+      <div class="summary"><div><span>입력</span><strong>4</strong></div><div><span>변경 없음</span><strong>1</strong></div><div><span>변경</span><strong>1</strong></div><div><span>제거</span><strong>1</strong></div><div><span>오류/보류</span><strong>1</strong></div></div>
+      <div class="table-wrap"><table><thead><tr><th>상태</th><th>행</th><th>변경 전</th><th>변경 후</th><th>이유</th></tr></thead><tbody><tr><td><span class="status changed">변경</span></td><td>2</td><td> Alice </td><td>Alice</td><td>앞뒤 공백 제거</td></tr><tr><td><span class="status removed">제거</span></td><td>4</td><td>A-001</td><td>—</td><td>중복 주문번호</td></tr><tr><td><span class="status rejected">오류</span></td><td>5</td><td>12abc</td><td>—</td><td>유효한 숫자가 아님</td></tr></tbody></table></div>
+      <div class="review-box"><h3>당신이 볼 것</h3><label>□ 이것이 “전체 실행 전 샘플”임을 명확히 이해할 수 있는가?</label><label>□ 변경·제거·오류 차이가 직관적인가?</label><label>□ 결과를 보고 전체 실행 여부를 결정할 수 있는가?</label></div>
+      <div class="actions"><button class="secondary" data-prev="2">규칙 수정</button><button data-next="4">전체 행 처리</button></div>
+    </section>
+    <section data-page="4" class="hidden">
+      <h2>5. 결과</h2><div class="panel">✓ 행 수 검증 정상 — 입력 4행이 유지/변경/제거/오류로 정확히 분류되었습니다.</div>
+      <div class="summary"><div><span>입력</span><strong>4</strong></div><div><span>변경 없음</span><strong>1</strong></div><div><span>변경</span><strong>1</strong></div><div><span>제거</span><strong>1</strong></div><div><span>오류/보류</span><strong>1</strong></div></div>
+      <h3>다운로드</h3><div class="download-grid"><button>결과 Excel</button><button>오류 Excel</button><button>HTML 보고서</button><button>설정 JSON</button></div>
+      <div class="review-box"><h3>당신이 볼 것</h3><label>□ 작업이 정상 완료됐다는 신뢰가 생기는가?</label><label>□ 4개 다운로드 중 무엇을 받아야 하는지 이해되는가?</label><label>□ “오류 Excel”과 “HTML 보고서”의 차이를 바로 알 수 있는가?</label></div>
+      <div class="actions"><button class="secondary" data-prev="3">이전</button><button data-next="0">처음부터</button></div>
+    </section>
+  </main>
+</div>
+<script>
+const labels=['작업','파일','규칙','시험','결과']; let page=0;
+function render(){document.querySelectorAll('[data-page]').forEach((x,i)=>x.classList.toggle('hidden',i!==page));document.getElementById('stepper').innerHTML=labels.map((x,i)=>`<div class="step ${i===page?'active':''}">${i+1}. ${x}</div>`).join('');window.scrollTo({top:0,behavior:'instant'});} 
+document.addEventListener('click',e=>{const b=e.target.closest('[data-next],[data-prev]');if(!b)return;page=Number(b.dataset.next??b.dataset.prev);render();});render();
+</script>
+</body></html>

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-workbook-reader"
+  },
+  "include": [
+    "../../src/domain/**/*.ts",
+    "../../src/file-io/workbook-reader.ts",
+    "../../src/file-io/normalize-sheet.ts",
+    "./workbook-reader-check.ts",
+    "./xlsx-stub.d.ts"
+  ]
+}

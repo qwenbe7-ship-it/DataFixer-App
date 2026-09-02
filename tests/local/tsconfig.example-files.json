@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "outDir": "../../.local-test-example-files"
+  },
+  "include": [
+    "../../src/domain/**/*.ts",
+    "../../src/file-io/workbook-reader.ts",
+    "../../src/file-io/normalize-sheet.ts",
+    "../../src/app/process-job.ts",
+    "../../src/app/app-reducer.ts",
+    "../../src/rules/**/*.ts",
+    "../../src/evidence/**/*.ts",
+    "../../src/export/workbook-model.ts",
+    "../../src/export/html-report.ts",
+    "../../src/export/job-settings.ts",
+    "../../src/export/settings-export.ts",
+    "./example-files-check.ts",
+    "./xlsx-stub.d.ts",
+    "./node-fs-stub.d.ts"
+  ]
+}

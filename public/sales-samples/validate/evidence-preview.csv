@@ -1,0 +1,8 @@
+source_row,rule,reason
+3,unique-email,Email is duplicated
+3,status-allowed,Status is not ACTIVE or INACTIVE
+3,age-range,Age is below 18
+3,name-length,Name is shorter than 2 characters
+3,code-shape,Code does not match AB-###
+3,min-lte-max,min_value is greater than max_value
+4,unique-email,Email is duplicated

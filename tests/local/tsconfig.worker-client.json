@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target":"ES2022","module":"CommonJS","moduleResolution":"Node","strict":true,"skipLibCheck":true,"lib":["ES2022","DOM"],"outDir":"../../.local-test-worker-client"},
+  "include": ["../../src/domain/errors.ts","../../src/domain/types.ts","../../src/worker/protocol.ts","../../src/worker/client.ts","worker-client-check.ts"]
+}

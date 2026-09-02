@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "../../.local-test-engine"
+  },
+  "include": [
+    "../../src/domain/types.ts",
+    "../../src/domain/errors.ts",
+    "../../src/domain/factories.ts",
+    "../../src/rules/clean.ts",
+    "../../src/rules/engine.ts",
+    "./engine-check.ts"
+  ]
+}
