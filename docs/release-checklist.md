@@ -2,7 +2,7 @@
 
 Status values are restricted to `PASS`, `FAIL`, `BLOCKED`, and `NOT_SUPPORTED`.
 
-Runtime verification baseline: commit `11b8073991e015fb22789e409e8e88517bfe6982`, GitHub Actions run `33583805040`. Documentation-only commits may advance `main` without changing this baseline; update it when runtime-affecting source, dependency, build/hosting configuration, workflow, or test changes occur.
+Runtime verification baseline: commit `6e782059180a36368aca1cac22d01f58acd16410`, GitHub production-gate run `33587953565`, automated live-host run `33588151511`. Documentation-only commits may advance `main` without changing this baseline; update it when runtime-affecting source, dependency, build/hosting configuration, workflow, or test changes occur.
 
 ## Representative acceptance scenarios
 
@@ -15,7 +15,7 @@ Runtime verification baseline: commit `11b8073991e015fb22789e409e8e88517bfe6982`
 | Pattern Normalize phones/SKUs | PASS | PASS | Actual CSV example: 3 input = 0 unchanged + 3 changed + 0 removed + 0 rejected |
 | Fill / Default / Coalesce | PASS | PASS | Actual CSV example: 4 input = 1 unchanged + 3 changed + 0 removed + 0 rejected |
 
-Local acceptance is implemented in `tests/local/release-scenarios-check.ts`. The official Playwright run executes the E2E suite against the built production preview and passes across Chrome, Edge and Firefox.
+Local acceptance is implemented in `tests/local/release-scenarios-check.ts`. The official Playwright run executes the E2E suite against the built production preview and passes across Chrome, Edge and Firefox. The deployed Vercel origin additionally passes dedicated CSV, XLSX, privacy/header and offline smoke verification in Chrome.
 
 ## Spec-to-build audit
 
@@ -25,7 +25,7 @@ Local acceptance is implemented in `tests/local/release-scenarios-check.ts`. The
 | 2. Problem to solve | Evidence ledger, reusable settings and guided workflow implement the stated solution | PASS |
 | 3. Primary success criterion | Reconciliation, reason completeness and representative browser flows pass | PASS |
 | 4. Target users / bilingual | Korean and English dictionaries have matching keys; guides exist in both languages | PASS |
-| 5.1 Supported input | File limits, CSV normalization and real SheetJS CSV/XLSX handling pass official gates | PASS |
+| 5.1 Supported input | File limits, CSV normalization and real SheetJS CSV/XLSX handling pass official and live-host gates | PASS |
 | 5.2 Clean rules | Rule/engine checks, regex safety and Fill/Default/Coalesce pass | PASS |
 | 5.3 Merge rules | Mapping, null fill, source column, stable order, dedupe, output types, numeric normalization, conflicts and evidence pass | PASS |
 | 5.4 Validate rules | All rule kinds, strict numeric CSV semantics, source preservation and multi-reason rejection pass | PASS |
@@ -34,10 +34,10 @@ Local acceptance is implemented in `tests/local/release-scenarios-check.ts`. The
 | 6. User flow | Reducer, browser component tests and end-to-end flows pass | PASS |
 | 7. Screen design | Automated browser flow is PASS; manual accessibility/visual polish remains non-blocking quality work | PASS |
 | 8. Architecture | Static app, isolated modules, worker protocol and architecture harness pass | PASS |
-| 9. Privacy and security | Local production-preview network/privacy/CSP tests pass; live Vercel host capture remains | BLOCKED |
+| 9. Privacy and security | Production-preview and live Vercel header/network/privacy/offline verification pass | PASS |
 | 10. Error handling | Structured errors and preflight validation are covered by regression/official checks | PASS |
-| 11. Tests and verification | Harness, 74 unit tests, 4 browser tests and 33 Playwright E2E tests pass | PASS |
-| 12. V1 completion criteria | Product/CI gates pass; live-host verification and `main` protection are still required for the operational release gate | BLOCKED |
+| 11. Tests and verification | Harness, 74 unit tests, 4 browser tests and 36 Playwright E2E tests pass; live deployed-host suite is 5/5 PASS | PASS |
+| 12. V1 runtime completion criteria | Product, CI, Vercel deployment and live-host verification gates pass | PASS |
 | 13. Public sample workflows | Synthetic Clean/Merge/Validate examples are retained without internal commercial strategy/customer data | PASS |
 | 14. V1 exclusions | No login, cloud DB, AI API, email automation, OCR, payments or analytics in runtime source | PASS |
 | 15. Expansion conditions | Lookup, Pattern Normalize and Fill/Default/Coalesce are approved extensions; fuzzy/API/cloud features remain out of scope | PASS |
@@ -47,23 +47,29 @@ Local acceptance is implemented in `tests/local/release-scenarios-check.ts`. The
 
 | Browser | Status | Notes |
 |---|---|---|
-| Chrome current | PASS | Official Playwright `chrome` project passes |
+| Chrome current | PASS | Official matrix passes; live production smoke/privacy gate also passes |
 | Edge current | PASS | Official Playwright `msedge` project passes |
 | Firefox current | PASS | Official Playwright Firefox project passes |
 | Safari | NOT_SUPPORTED | V1 does not promise Safari support |
 
-## Privacy release gate
+## Privacy and live-host release gate
 
-Local production-preview browser status: `PASS`.
+Production origin: `https://data-fixer-app.vercel.app`
 
-Verified by Playwright:
+Verified on the deployed host:
+- `Content-Security-Policy` contains `frame-ancestors 'none'`;
+- `X-Content-Type-Options: nosniff`;
+- `X-Frame-Options: DENY`;
+- `Referrer-Policy: no-referrer`;
+- restrictive `Permissions-Policy` for camera, microphone, geolocation, payment and USB;
 - zero non-GET requests during customer-file processing;
 - zero requests to an origin other than the app origin;
 - no customer-derived value in request URL, body, headers or console output;
-- processing and downloads continue after the already-opened page is put offline;
-- the local production preview delivers CSP containing `frame-ancestors 'none'`.
+- CSV Clean smoke flow succeeds;
+- a generated real XLSX workbook is accepted and reconciled successfully;
+- processing and four downloads continue after the already-opened page is switched offline.
 
-Live Vercel host status: `BLOCKED` only because the actual deployed response/network trace has not yet been captured directly. `vercel.json` defines the required hosting headers and GitHub reports the Vercel deployment for the runtime baseline as successful.
+Automated live-host run `33588151511`: `PASS`, with 5/5 Chrome tests passing after the workflow waited for the merged `main` Vercel status to become successful.
 
 ## Official production evidence
 
@@ -79,17 +85,16 @@ python scripts/verify.py official
 Runtime baseline results:
 - harness job: PASS;
 - production job: PASS;
-- unit tests: 74 PASS;
-- browser tests: 4 PASS;
-- Playwright E2E: 33 PASS;
+- unit tests: 74/74 PASS;
+- browser tests: 4/4 PASS;
+- Playwright E2E: 36/36 PASS across Chrome, Edge and Firefox;
 - final marker: `ALL_OFFICIAL_PRODUCTION_GATES_PASS`;
-- `datafixer-verification` and `datafixer-dist` artifacts generated from the same clean runtime baseline SHA.
+- `datafixer-verification` artifact digest: `sha256:600b363dbad6f5bdba85baa520cc70c9821d4260989fc4f142f3ca4d57318752`;
+- `datafixer-dist` artifact digest: `sha256:3c53b8bb651cd0cdbb86d21884e6247153bb91def83cd5887d9d80a5956f5632`;
+- both artifacts were generated from runtime baseline SHA `6e782059180a36368aca1cac22d01f58acd16410`.
 
-## Remaining operational release gates
+## Remaining operational release-process gap
 
-Current status: `BLOCKED` for public/customer release by two operational items only:
+The runtime/customer-host release gates are `PASS`.
 
-1. Directly capture the live Vercel production response and repeat the privacy smoke test against that deployed origin.
-2. Enable an enforced GitHub `main` ruleset requiring pull requests and the production-gate checks, with force-push/deletion blocked.
-
-The former bootstrap, package-registry, real-XLSX, browser-matrix and remote-CI blockers are resolved and must not be reported as current blockers.
+One repository-governance item remains: enable an enforced GitHub `main` ruleset requiring pull requests and the production-gate checks, with force-push and branch deletion blocked. GitHub currently reports `main` as unprotected. This is a P1 release-process gap, not a known application/runtime correctness failure.
