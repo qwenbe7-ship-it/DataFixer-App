@@ -1,29 +1,24 @@
 # DataFixer Active Technical Debt
 
-Only active debt or release-process gaps belong here. Resolved bootstrap and browser blockers are intentionally removed from the active list.
+Only active debt or release-process gaps belong here. Resolved bootstrap, browser and live-host verification blockers are intentionally removed from the active list.
 
 ## Runtime verification baseline
 
-This section identifies the last runtime-affecting commit used for the detailed release evidence. Documentation-only commits may advance `main` without changing this baseline; update it only when application source, dependencies, build/hosting configuration, workflows, or tests materially change.
+This section identifies the last runtime-affecting commit used for release evidence. Documentation-only commits may advance `main` without changing this baseline; update it only when application source, dependencies, build/hosting configuration, workflows, or tests materially change.
 
-- Runtime-affecting baseline commit: `11b8073991e015fb22789e409e8e88517bfe6982`
-- GitHub Actions evidence run: `33583805040`
+- Runtime-affecting baseline commit: `6e782059180a36368aca1cac22d01f58acd16410`
+- GitHub production-gate run: `33587953565`
 - Harness: PASS
 - Official production gates: PASS
-- Unit tests: 74 PASS
-- Browser tests: 4 PASS
-- Playwright E2E: 33 PASS across Chrome, Edge and Firefox
-- Vercel Git status on the runtime baseline: `success` / `Deployment has completed`
+- Unit tests: 74/74 PASS
+- Browser tests: 4/4 PASS
+- Playwright E2E: 36/36 PASS across Chrome, Edge and Firefox
+- Production artifacts: `datafixer-verification` and `datafixer-dist` generated from the same baseline SHA
+- Vercel Git status: `success` / `Deployment has completed`
 - Vercel target project: `qwenbe/data-fixer-app`
-
-## TD-003 — Live Vercel host privacy/header capture pending
-
-- **Severity:** P0 release-verification gate for a public/customer launch
-- **State:** OPEN; local production-preview privacy verification is PASS, but the deployed Vercel response has not yet been captured directly
-- **Trigger:** public/customer release
-- **Evidence already PASS:** zero non-GET/off-origin requests and zero customer-data request/console leaks in Playwright; offline continuation works; repository `vercel.json` defines CSP `frame-ancestors 'none'`, `nosniff`, `DENY`, `no-referrer`, and restrictive Permissions-Policy
-- **Remaining gap:** verify those headers and privacy behavior against the actual Vercel production URL
-- **Exit criterion:** a live-host browser/curl capture confirms required response headers, and a browser smoke test against the deployed origin confirms no customer spreadsheet bytes or derived values are transmitted
+- Production origin: `https://data-fixer-app.vercel.app`
+- Automated live-host verification run: `33588151511` — PASS
+- Live-host browser smoke: 5/5 PASS in Chrome (CSV, XLSX, privacy/header and offline behavior)
 
 ## TD-005 — Performance baseline not versioned
 
@@ -38,8 +33,8 @@ This section identifies the last runtime-affecting commit used for the detailed 
 - **Severity:** P1 release-process gap
 - **State:** OPEN
 - **Evidence:** GitHub reports `main` as `protected: false` and repository rulesets are empty
-- **Impact:** CI is green, but GitHub does not yet enforce PR-only changes or required checks at the repository boundary
-- **Exit criterion:** an active `main` ruleset requires pull requests and the DataFixer production-gate checks, while blocking force-push/deletion
+- **Impact:** CI and live-host verification are green, but GitHub does not yet enforce PR-only changes or required checks at the repository boundary
+- **Exit criterion:** an active `main` ruleset requires pull requests and the production-gate checks, while blocking force-push/deletion
 
 ## TD-008 — Production bundle size warning
 
@@ -51,4 +46,15 @@ This section identifies the last runtime-affecting commit used for the detailed 
 
 ## Resolved blockers
 
-The following earlier P0 items are closed by the verified public repository and GitHub-hosted production run: canonical lockfile/bootstrap, real SheetJS execution, XLSX import/export verification, Chrome/Edge/Firefox browser matrix, remote official CI, and production build artifact generation.
+The following earlier blockers are closed by the verified public repository and GitHub-hosted release path:
+
+- canonical lockfile/bootstrap and trusted dependency installation;
+- real SheetJS execution and XLSX import/export verification;
+- Chrome/Edge/Firefox browser matrix;
+- remote official CI and production build artifact generation;
+- live Vercel response-header verification;
+- live customer-data privacy/network smoke verification;
+- live CSV and XLSX browser smoke tests;
+- offline continuation and download verification on the deployed production origin.
+
+The live-host gate is now permanent: after a successful `main` production-gate run it waits for the matching Vercel status, verifies the production response headers, then reruns the deployed-host smoke/privacy suite.
