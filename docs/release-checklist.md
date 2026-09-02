@@ -2,7 +2,7 @@
 
 Status values are restricted to `PASS`, `FAIL`, `BLOCKED`, and `NOT_SUPPORTED`.
 
-Evidence baseline: verified `main` commit `11b8073991e015fb22789e409e8e88517bfe6982`, GitHub Actions run `33583805040`.
+Runtime verification baseline: commit `11b8073991e015fb22789e409e8e88517bfe6982`, GitHub Actions run `33583805040`. Documentation-only commits may advance `main` without changing this baseline; update it when runtime-affecting source, dependency, build/hosting configuration, workflow, or test changes occur.
 
 ## Representative acceptance scenarios
 
@@ -63,7 +63,7 @@ Verified by Playwright:
 - processing and downloads continue after the already-opened page is put offline;
 - the local production preview delivers CSP containing `frame-ancestors 'none'`.
 
-Live Vercel host status: `BLOCKED` only because the actual deployed response/network trace has not yet been captured directly. `vercel.json` defines the required hosting headers and GitHub reports the Vercel deployment for the verified `main` commit as successful.
+Live Vercel host status: `BLOCKED` only because the actual deployed response/network trace has not yet been captured directly. `vercel.json` defines the required hosting headers and GitHub reports the Vercel deployment for the runtime baseline as successful.
 
 ## Official production evidence
 
@@ -76,14 +76,14 @@ npm ci --ignore-scripts
 python scripts/verify.py official
 ```
 
-Latest verified results:
+Runtime baseline results:
 - harness job: PASS;
 - production job: PASS;
 - unit tests: 74 PASS;
 - browser tests: 4 PASS;
 - Playwright E2E: 33 PASS;
 - final marker: `ALL_OFFICIAL_PRODUCTION_GATES_PASS`;
-- `datafixer-verification` and `datafixer-dist` artifacts generated from the same clean `main` SHA.
+- `datafixer-verification` and `datafixer-dist` artifacts generated from the same clean runtime baseline SHA.
 
 ## Remaining operational release gates
 
