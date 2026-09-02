@@ -113,10 +113,12 @@ async function measuredIteration(caseDef: BenchmarkCaseDefinition): Promise<{
   gc();
   const heapBeforeBytes = process.memoryUsage().heapUsed;
   const started = performance.now();
-  let result: ProcessingResult | undefined = await processDatasets(request);
-  const elapsedMs = performance.now() - started;
-  assertCorrectness(result, caseDef.rows.reduce((sum, value) => sum + value, 0));
-  result = undefined;
+  let elapsedMs = 0;
+  {
+    const result = await processDatasets(request);
+    elapsedMs = performance.now() - started;
+    assertCorrectness(result, caseDef.rows.reduce((sum, value) => sum + value, 0));
+  }
   gc();
   const heapAfterGcBytes = process.memoryUsage().heapUsed;
   const retainedHeapMiB = Math.max(0, heapAfterGcBytes - heapBeforeBytes) / MIB;
